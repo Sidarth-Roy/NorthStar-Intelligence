@@ -1,4 +1,3 @@
-go work init ./Backend ./DB
+go mod edit -replace github.com/Sidarth-Roy/NorthStar-Intelligence/Backend=../Backend
 go mod download
-go clean -modcache
 go mod tidy

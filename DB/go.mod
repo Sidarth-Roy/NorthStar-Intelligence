@@ -1,8 +1,12 @@
-module github.com/Sidarth-Roy/NorthStar-Intelligence/Backend
+module github.com/Sidarth-Roy/NorthStar-Intelligence/DB
 
 go 1.21
 
+// THIS IS THE MAGIC LINE
+replace github.com/Sidarth-Roy/NorthStar-Intelligence/Backend => ../Backend
+
 require (
+	github.com/Sidarth-Roy/NorthStar-Intelligence/Backend v0.0.0
 	gorm.io/driver/postgres v1.5.4
 	gorm.io/gorm v1.25.5
 )
