@@ -11,7 +11,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	// Replace with your actual module path
-	"github.com/Sidarth-Roy/NorthStar-Intelligence/Backend/internal/model" 
+	"github.com/Sidarth-Roy/NorthStar-Intelligence/Backend/pkg/model" 
 )
 
 func main() {
@@ -51,27 +51,27 @@ func openCSV(path string) [][]string {
 }
 
 func seedCategories(db *gorm.DB) {
-	for _, row := range openCSV("DB/Northwind Traders Kaggle Dataset CSV/categories.csv") {
+	for _, row := range openCSV("Northwind_Traders_Kaggle_Dataset_CSV/categories.csv") {
 		id, _ := strconv.Atoi(row[0])
 		db.Create(&model.Category{CategoryID: uint(id), CategoryName: row[1], Description: row[2]})
 	}
 }
 
 func seedShippers(db *gorm.DB) {
-	for _, row := range openCSV("DB/Northwind Traders Kaggle Dataset CSV/shippers.csv") {
+	for _, row := range openCSV("Northwind_Traders_Kaggle_Dataset_CSV/shippers.csv") {
 		id, _ := strconv.Atoi(row[0])
 		db.Create(&model.Shipper{ShipperID: uint(id), CompanyName: row[1]})
 	}
 }
 
 func seedCustomers(db *gorm.DB) {
-	for _, row := range openCSV("DB/Northwind Traders Kaggle Dataset CSV/customers.csv") {
+	for _, row := range openCSV("Northwind_Traders_Kaggle_Dataset_CSV/customers.csv") {
 		db.Create(&model.Customer{CustomerID: row[0], CompanyName: row[1], ContactName: row[2], ContactTitle: row[3], City: row[4], Country: row[5]})
 	}
 }
 
 func seedEmployees(db *gorm.DB) {
-	for _, row := range openCSV("DB/Northwind Traders Kaggle Dataset CSV/employees.csv") {
+	for _, row := range openCSV("Northwind_Traders_Kaggle_Dataset_CSV/employees.csv") {
 		id, _ := strconv.Atoi(row[0])
 		var reportsTo *uint
 		if row[5] != "" {
@@ -84,7 +84,7 @@ func seedEmployees(db *gorm.DB) {
 }
 
 func seedProducts(db *gorm.DB) {
-	for _, row := range openCSV("DB/Northwind Traders Kaggle Dataset CSV/products.csv") {
+	for _, row := range openCSV("Northwind_Traders_Kaggle_Dataset_CSV/products.csv") {
 		id, _ := strconv.Atoi(row[0])
 		price, _ := strconv.ParseFloat(row[3], 64)
 		disc, _ := strconv.Atoi(row[4])
@@ -95,7 +95,7 @@ func seedProducts(db *gorm.DB) {
 
 func seedOrders(db *gorm.DB) {
 	layout := "2006-01-02"
-	for _, row := range openCSV("DB/Northwind Traders Kaggle Dataset CSV/orders.csv") {
+	for _, row := range openCSV("Northwind_Traders_Kaggle_Dataset_CSV/orders.csv") {
 		id, _ := strconv.Atoi(row[0])
 		eID, _ := strconv.Atoi(row[2])
 		oDate, _ := time.Parse(layout, row[3])
@@ -114,7 +114,7 @@ func seedOrders(db *gorm.DB) {
 }
 
 func seedOrderDetails(db *gorm.DB) {
-	for _, row := range openCSV("DB/Northwind Traders Kaggle Dataset CSV/order_details.csv") {
+	for _, row := range openCSV("Northwind_Traders_Kaggle_Dataset_CSV/order_details.csv") {
 		oID, _ := strconv.Atoi(row[0])
 		pID, _ := strconv.Atoi(row[1])
 		uP, _ := strconv.ParseFloat(row[2], 64)
