@@ -11,7 +11,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	// Replace with your actual module path
-	"github.com/Sidarth-Roy/NorthStar-Intelligence/backend/internal/model" 
+	"github.com/Sidarth-Roy/NorthStar-Intelligence/Backend/internal/model" 
 )
 
 func main() {

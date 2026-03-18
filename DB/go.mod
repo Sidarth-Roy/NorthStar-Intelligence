@@ -1,4 +1,4 @@
-module github.com/your-username/northstar
+module github.com/Sidarth-Roy/NorthStar-Intelligence
 
 go 1.21
 
