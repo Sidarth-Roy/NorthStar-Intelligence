@@ -2,13 +2,14 @@ module github.com/Sidarth-Roy/NorthStar-Intelligence/DB
 
 go 1.21
 
-// THIS IS THE MAGIC LINE
+// issues due remote model fetching, will be resolved in the future
 replace github.com/Sidarth-Roy/NorthStar-Intelligence/Backend => ../Backend
 
 require (
 	github.com/Sidarth-Roy/NorthStar-Intelligence/Backend v0.0.0
+	golang.org/x/text v0.20.0
 	gorm.io/driver/postgres v1.5.4
-	gorm.io/gorm v1.25.5
+	gorm.io/gorm v1.31.1
 )
 
 require (
@@ -18,5 +19,4 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	golang.org/x/crypto v0.14.0 // indirect
-	golang.org/x/text v0.13.0 // indirect
 )
