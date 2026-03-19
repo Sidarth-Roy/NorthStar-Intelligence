@@ -1,7 +1,7 @@
 package model
 
 type Shipper struct {
-	ShipperID   uint    `gorm:"primaryKey" json:"shipperID"`
+	Base
 	CompanyName string  `json:"companyName"`
 	Orders      []Order `gorm:"foreignKey:ShipperID"`
 }
