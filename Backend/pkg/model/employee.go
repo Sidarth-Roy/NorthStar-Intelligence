@@ -1,11 +1,11 @@
 package model
 
 type Employee struct {
-	EmployeeID   uint      `gorm:"primaryKey" json:"employeeID"`
+	Base
 	EmployeeName string    `json:"employeeName"`
 	Title        string    `json:"title"`
 	City         string    `json:"city"`
 	Country      string    `json:"country"`
-	ReportsTo    *uint     `json:"reportsTo"` // Pointer for nulls
+	ReportsTo    *uint     `json:"reportsTo"`
 	Orders       []Order   `gorm:"foreignKey:EmployeeID"`
 }

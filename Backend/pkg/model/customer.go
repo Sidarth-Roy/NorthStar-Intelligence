@@ -1,11 +1,12 @@
 package model
 
 type Customer struct {
-	CustomerID   string  `gorm:"primaryKey" json:"customerID"`
+	Base
+	CustomerID   string  `gorm:"uniqueIndex" json:"customerID"` // The string ID from CSV
 	CompanyName  string  `json:"companyName"`
 	ContactName  string  `json:"contactName"`
 	ContactTitle string  `json:"contactTitle"`
 	City         string  `json:"city"`
 	Country      string  `json:"country"`
-	Orders       []Order `gorm:"foreignKey:CustomerID"`
+	Orders       []Order `gorm:"foreignKey:CustomerID;references:CustomerID"`
 }

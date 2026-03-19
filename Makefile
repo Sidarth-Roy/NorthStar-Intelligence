@@ -1,10 +1,11 @@
-setup:
+db-setup:
 	docker-compose up -d
-	sleep 5
-	go run DB/seed.go
 
 run-backend:
 	go run backend/main.go
 
-clean:
+db-close:
+	docker-compose down
+	
+db-clean:
 	docker-compose down -v

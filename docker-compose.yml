@@ -13,6 +13,30 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    # Required: Tells Docker how to check if the DB is actually ready
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d northwind"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # New Seeder Service
+  seeder:
+    image: golang:1.21-alpine # Use the Go version matching your project
+    container_name: northstar_seeder
+    volumes:
+      - .:/app # Mounts your current directory (including seed.go)
+    working_dir: /app/DB
+    environment:
+      - DB_HOST=db
+      - DB_USER=user
+      - DB_PASSWORD=password
+      - DB_NAME=northwind
+    # Run the seed command and exit when finished
+    command: go run seed.go
+    depends_on:
+      db:
+        condition: service_healthy # Only runs after healthcheck passes
 
   pgadmin:
     image: dpage/pgadmin4
