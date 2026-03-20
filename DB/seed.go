@@ -17,42 +17,34 @@ import (
 )
 
 func main() {
-// Grab the host from the environment (Docker), or fallback to localhost (Windows Terminal)
-	host := os.Getenv("DB_HOST")
-	if host == "" {
-		host = "localhost"
-	}
-	user := os.Getenv("DB_USER")
-	if user == "" {
-		user = "user"
-	}
-	password := os.Getenv("DB_PASSWORD")
-	if password == "" {
-		password = "password"
-	}
-	dbName := os.Getenv("DB_NAME")
-	if dbName == "" {
-		dbName = "northwind"
-	}
-	port := os.Getenv("DB_PORT")
-	if port == "" {
-		port = "5432"
-	}
-	sslMode := os.Getenv("DB_SSLMODE")
-	if sslMode == "" {
-		sslMode = "disable"
-	}
+	// Configuration with logging
+	host := getEnv("DB_HOST", "localhost")
+	user := getEnv("DB_USER", "user")
+	password := getEnv("DB_PASSWORD", "password")
+	dbName := getEnv("DB_NAME", "northwind")
+	port := getEnv("DB_PORT", "5432")
+	sslMode := getEnv("DB_SSLMODE", "disable")
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s", host, user, password, dbName, port, sslMode)
+	
+	log.Println("--- 🔌 Connecting to Database ---")
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatal("Failed to connect to database:", err)
+		log.Fatalf("❌ Critical: Failed to connect to database: %v", err)
 	}
 
-	// Drop and Re-create tables
-	db.Migrator().DropTable(&model.OrderDetail{}, &model.Order{}, &model.Product{}, &model.Employee{}, &model.Customer{}, &model.Shipper{}, &model.Category{})
-	db.AutoMigrate(&model.Category{}, &model.Shipper{}, &model.Customer{}, &model.Employee{}, &model.Product{}, &model.Order{}, &model.OrderDetail{})
+	log.Println("--- 🛠️  Running Migrations ---")
+	err = db.Migrator().DropTable(&model.OrderDetail{}, &model.Order{}, &model.Product{}, &model.Employee{}, &model.Customer{}, &model.Shipper{}, &model.Category{})
+	if err != nil {
+		log.Printf("⚠️ Warning during DropTable: %v", err)
+	}
 
+	err = db.AutoMigrate(&model.Category{}, &model.Shipper{}, &model.Customer{}, &model.Employee{}, &model.Product{}, &model.Order{}, &model.OrderDetail{})
+	if err != nil {
+		log.Fatalf("❌ Critical: Migration failed: %v", err)
+	}
+
+	// Seeding execution
 	seedCategories(db)
 	seedShippers(db)
 	seedCustomers(db)
@@ -61,41 +53,68 @@ func main() {
 	seedOrders(db)
 	seedOrderDetails(db)
 
-	fmt.Println("✅ Database seeded successfully with Active status and Timestamps.")
+	log.Println("✅ Database seeding process completed.")
+}
+
+// Helper to get environment variables
+func getEnv(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+	return fallback
 }
 
 func openCSV(path string) [][]string {
 	f, err := os.Open(path)
 	if err != nil {
-		log.Fatalf("❌ Cannot open %s: %v", path, err)
+		log.Printf("❌ Skipping file: Cannot open %s: %v", path, err)
+		return nil
 	}
 	defer f.Close()
 
-	// MAGIC HAPPENS HERE: Convert Windows-1252 (Standard CSV encoding) to strict UTF-8
 	decoder := charmap.Windows1252.NewDecoder().Reader(f)
-
 	r := csv.NewReader(decoder)
 	rows, err := r.ReadAll()
 	if err != nil {
-		log.Fatalf("❌ Error reading %s: %v", path, err)
+		log.Printf("❌ Error reading CSV %s: %v", path, err)
+		return nil
+	}
+	
+	if len(rows) <= 1 {
+		return nil
 	}
 	return rows[1:]
 }
 
 func seedCategories(db *gorm.DB) {
-	for _, row := range openCSV("Northwind_Traders_Kaggle_Dataset_CSV/categories.csv") {
-		id, _ := strconv.Atoi(row[0])
-		db.Create(&model.Category{
+	log.Println("📦 Seeding Categories...")
+	rows := openCSV("Northwind_Traders_Kaggle_Dataset_CSV/categories.csv")
+	for i, row := range rows {
+		id, err := strconv.Atoi(row[0])
+		if err != nil {
+			log.Printf("⚠️  Row %d: Invalid ID %s, skipping", i, row[0])
+			continue
+		}
+		res := db.Create(&model.Category{
 			Base:         model.Base{ID: uint(id), Active: true},
 			CategoryName: row[1],
 			Description:  row[2],
 		})
+		if res.Error != nil {
+			log.Printf("❌ DB Error (Categories): %v", res.Error)
+		}
 	}
 }
 
 func seedShippers(db *gorm.DB) {
-	for _, row := range openCSV("Northwind_Traders_Kaggle_Dataset_CSV/shippers.csv") {
-		id, _ := strconv.Atoi(row[0])
+	log.Println("🚚 Seeding Shippers...")
+	rows := openCSV("Northwind_Traders_Kaggle_Dataset_CSV/shippers.csv")
+	for i, row := range rows {
+		id, err := strconv.Atoi(row[0])
+		if err != nil {
+			log.Printf("⚠️  Row %d: Invalid ID %s", i, row[0])
+			continue
+		}
 		db.Create(&model.Shipper{
 			Base:        model.Base{ID: uint(id), Active: true},
 			CompanyName: row[1],
@@ -104,9 +123,11 @@ func seedShippers(db *gorm.DB) {
 }
 
 func seedCustomers(db *gorm.DB) {
-	for _, row := range openCSV("Northwind_Traders_Kaggle_Dataset_CSV/customers.csv") {
+	log.Println("👥 Seeding Customers...")
+	rows := openCSV("Northwind_Traders_Kaggle_Dataset_CSV/customers.csv")
+	for _, row := range rows {
 		db.Create(&model.Customer{
-			Base:         model.Base{Active: true}, // ID is auto-gen
+			Base:         model.Base{Active: true},
 			CustomerID:   row[0],
 			CompanyName:  row[1],
 			ContactName:  row[2],
@@ -118,13 +139,20 @@ func seedCustomers(db *gorm.DB) {
 }
 
 func seedEmployees(db *gorm.DB) {
-	for _, row := range openCSV("Northwind_Traders_Kaggle_Dataset_CSV/employees.csv") {
-		id, _ := strconv.Atoi(row[0])
+	log.Println("👔 Seeding Employees...")
+	rows := openCSV("Northwind_Traders_Kaggle_Dataset_CSV/employees.csv")
+	for _, row := range rows {
+		id, err := strconv.Atoi(row[0])
+		if err != nil {
+			continue
+		}
 		var reportsTo *uint
 		if row[5] != "" && row[5] != "NULL" {
-			val, _ := strconv.Atoi(row[5])
-			uVal := uint(val)
-			reportsTo = &uVal
+			val, err := strconv.Atoi(row[5])
+			if err == nil {
+				uVal := uint(val)
+				reportsTo = &uVal
+			}
 		}
 		db.Create(&model.Employee{
 			Base:         model.Base{ID: uint(id), Active: true},
@@ -138,25 +166,33 @@ func seedEmployees(db *gorm.DB) {
 }
 
 func seedProducts(db *gorm.DB) {
-	for _, row := range openCSV("Northwind_Traders_Kaggle_Dataset_CSV/products.csv") {
+	log.Println("🍎 Seeding Products...")
+	rows := openCSV("Northwind_Traders_Kaggle_Dataset_CSV/products.csv")
+	for _, row := range rows {
 		id, _ := strconv.Atoi(row[0])
 		price, _ := strconv.ParseFloat(row[3], 64)
 		disc, _ := strconv.Atoi(row[4])
 		catID, _ := strconv.Atoi(row[5])
-		db.Create(&model.Product{
+		
+		err := db.Create(&model.Product{
 			Base:            model.Base{ID: uint(id), Active: true},
 			ProductName:     row[1],
 			QuantityPerUnit: row[2],
 			UnitPrice:       price,
 			Discontinued:    disc,
 			CategoryID:      uint(catID),
-		})
+		}).Error
+		if err != nil {
+			log.Printf("❌ Failed to create product %s: %v", row[1], err)
+		}
 	}
 }
 
 func seedOrders(db *gorm.DB) {
+	log.Println("📝 Seeding Orders...")
 	layout := "2006-01-02"
-	for _, row := range openCSV("Northwind_Traders_Kaggle_Dataset_CSV/orders.csv") {
+	rows := openCSV("Northwind_Traders_Kaggle_Dataset_CSV/orders.csv")
+	for _, row := range rows {
 		id, _ := strconv.Atoi(row[0])
 		eID, _ := strconv.Atoi(row[2])
 		oDate, _ := time.Parse(layout, row[3])
@@ -166,11 +202,13 @@ func seedOrders(db *gorm.DB) {
 		
 		var sDate *time.Time
 		if row[5] != "" && row[5] != "NULL" {
-			t, _ := time.Parse(layout, row[5])
-			sDate = &t
+			t, err := time.Parse(layout, row[5])
+			if err == nil {
+				sDate = &t
+			}
 		}
 
-		db.Create(&model.Order{
+		err := db.Create(&model.Order{
 			Base:         model.Base{ID: uint(id), Active: true},
 			CustomerID:   row[1],
 			EmployeeID:   uint(eID),
@@ -179,19 +217,25 @@ func seedOrders(db *gorm.DB) {
 			ShippedDate:  sDate,
 			ShipperID:    uint(sID),
 			Freight:      f,
-		})
+		}).Error
+		if err != nil {
+			log.Printf("❌ Order ID %d insert failed: %v", id, err)
+		}
 	}
 }
 
 func seedOrderDetails(db *gorm.DB) {
-	for _, row := range openCSV("Northwind_Traders_Kaggle_Dataset_CSV/order_details.csv") {
+	log.Println("🛒 Seeding Order Details...")
+	rows := openCSV("Northwind_Traders_Kaggle_Dataset_CSV/order_details.csv")
+	for _, row := range rows {
 		oID, _ := strconv.Atoi(row[0])
 		pID, _ := strconv.Atoi(row[1])
 		uP, _ := strconv.ParseFloat(row[2], 64)
 		q, _ := strconv.Atoi(row[3])
 		d, _ := strconv.ParseFloat(row[4], 64)
+		
 		db.Create(&model.OrderDetail{
-			Base:      model.Base{Active: true}, // Surrogate ID auto-gen
+			Base:      model.Base{Active: true},
 			OrderID:   uint(oID),
 			ProductID: uint(pID),
 			UnitPrice: uP,
