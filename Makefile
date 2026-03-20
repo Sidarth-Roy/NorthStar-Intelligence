@@ -3,9 +3,12 @@ db-setup:
 
 run-backend:
 	go run backend/main.go
-
-db-close:
-	docker-compose down
 	
 db-clean:
 	docker-compose down -v
+
+db-start:
+	docker-compose start
+
+db-stop:
+	docker-compose stop

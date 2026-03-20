@@ -22,7 +22,7 @@ services:
 
   # New Seeder Service
   seeder:
-    image: golang:1.21-alpine # Use the Go version matching your project
+    image: golang:1.25-alpine # Use the Go version matching your project
     container_name: northstar_seeder
     volumes:
       - .:/app # Mounts your current directory (including seed.go)
