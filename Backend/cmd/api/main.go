@@ -1,4 +1,3 @@
-// Entry point & Graceful Shutdown
 package main
 
 import (
@@ -9,66 +8,86 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Sidarth-Roy/NorthStar-Intelligence/Backend/internal/controller"
-	"github.com/Sidarth-Roy/NorthStar-Intelligence/Backend/internal/middleware"
+	"github.com/Sidarth-Roy/NorthStar-Intelligence/Backend/internal/api"
+	"github.com/Sidarth-Roy/NorthStar-Intelligence/Backend/internal/api/v1"
 	"github.com/Sidarth-Roy/NorthStar-Intelligence/Backend/internal/repository"
 	"github.com/Sidarth-Roy/NorthStar-Intelligence/Backend/internal/service"
+	"github.com/Sidarth-Roy/NorthStar-Intelligence/Backend/pkg/config"
 	"github.com/Sidarth-Roy/NorthStar-Intelligence/Backend/pkg/db"
 	"github.com/Sidarth-Roy/NorthStar-Intelligence/Backend/pkg/logger"
-	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
-func SetupRoutes(r *gin.Engine, pc *controller.ProductController) {
-	api := r.Group("/api/v1")
-	{
-		productGroup := api.Group("/products")
-		{
-			productGroup.POST("/", pc.Create)
-			productGroup.GET("/:id", pc.GetByID)
-			// productGroup.PUT("/:id", pc.Update)
-			// productGroup.DELETE("/:id", pc.Delete)
-		}
-	}
-}
-
 func main() {
-	database := db.GetDB(os.Getenv("DATABASE_URL"))
-	r := gin.New()
+	// 1. Load Config & Init Singleton Logger
+	cfg := config.LoadConfig()
+	logger.InitLogger()
+	log := logger.Get()
+
+	// 2. Init Singleton DB
+	database := db.GetDB(cfg.DatabaseURL)
+
+	// 3. DI Setup
+	// Products
+	prodRepo := repository.NewProductRepo(database)
+	prodSvc := service.NewProductSvc(prodRepo)
+	prodCtrl := v1.NewProductController(prodSvc)
+
+	// Categories (New Addition)
+	catRepo := repository.NewCategoryRepo(database)
+	catSvc := service.NewCategorySvc(catRepo)
+	catCtrl := v1.NewCategoryController(catSvc)
+
+	// Customers
+	custRepo := repository.NewCustomerRepo(database)
+	custSvc := service.NewCustomerSvc(custRepo)
+	custCtrl := v1.NewCustomerController(custSvc)
+
+	// Employees
+	empRepo := repository.NewEmployeeRepo(database)
+	empSvc := service.NewEmployeeSvc(empRepo)
+	empCtrl := v1.NewEmployeeController(empSvc)
+
+	// Shippers
+	shipRepo := repository.NewShipperRepo(database)
+	shipSvc := service.NewShipperSvc(shipRepo)
+	shipCtrl := v1.NewShipperController(shipSvc)
+
+	// Orders
+	orderRepo := repository.NewOrderRepo(database)
+	orderSvc := service.NewOrderSvc(orderRepo)
+	orderCtrl := v1.NewOrderController(orderSvc)
 	
-	// Middleware
-	r.Use(gin.Recovery())
-	r.Use(middleware.GlobalErrorHandler())
-
-	// Health Check
-	r.GET("/health", func(c *gin.Context) {
-		c.JSON(200, gin.H{"status": "healthy"})
-	})
-
-	// Dependency Injection
-	productRepo := repository.NewProductRepo(database)
-	productService := service.NewProductService(productRepo)
-	productController := controller.NewProductController(productService)
-
-	// Routes
-	v1 := r.Group("/api/v1")
-	{
-		v1.POST("/products", productController.Create)
-		v1.GET("/products/:id", productController.GetByID)
+	// 4. Router Setup
+	router := api.SetupRouter(prodCtrl, catCtrl, custCtrl, empCtrl, shipCtrl, orderCtrl)
+	
+	// 5. Server Configuration
+	srv := &http.Server{
+		Addr:    ":" + cfg.Port,
+		Handler: router,
 	}
 
-	// Graceful Shutdown
-	srv := &http.Server{Addr: ":8080", Handler: r}
+	// 6. Start Server in Goroutine
 	go func() {
+		log.Info("🚀 NorthStar API starting", zap.String("port", cfg.Port))
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			logger.Get().Fatal().Err(err).Msg("Listen error")
+			log.Fatal("Server failed", zap.Error(err))
 		}
 	}()
 
+	// 7. Graceful Shutdown
 	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 	<-quit
-	
+
+	log.Info("Shutting down server...")
+
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	srv.Shutdown(ctx)
+
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatal("Server forced to shutdown", zap.Error(err))
+	}
+
+	log.Info("Server exited gracefully")
 }
