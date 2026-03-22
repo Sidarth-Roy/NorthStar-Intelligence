@@ -50,3 +50,21 @@ Backend/
 ├── .env                             # Database credentials & App Port
 ├── go.mod
 └── go.sum
+
+Run all tests in the project:
+    go test ./...
+
+Run only Service layer tests:
+    go test ./internal/service/...
+
+Run with Verbose output (shows pass/fail for each specific test case):
+    go test -v ./internal/service/category_service_test.go ./internal/service/category_service.go
+
+Run and check Code Coverage:
+    go test -cover ./internal/service/...
+
+Run tests and generate the profile (Ensure the path is correct)
+    go test ./internal/service/... -coverprofile=services_coverage.out
+
+Open the HTML representation
+    go tool cover -html=services_coverage
