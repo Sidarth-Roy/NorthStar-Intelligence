@@ -1,35 +1,50 @@
-// This middleware catches panics and errors, formatting them into your required JSON log structure.
 package middleware
 
 import (
 	"net/http"
+	"runtime/debug"
 	"time"
 
 	"github.com/Sidarth-Roy/NorthStar-Intelligence/Backend/pkg/logger"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
+	"go.uber.org/zap"
 )
 
-func GlobalErrorHandler() gin.HandlerFunc {
+func GlobalExceptionHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		requestID := uuid.New().String()
-		c.Set("RequestID", requestID)
-		start := time.Now()
+		defer func() {
+			if err := recover(); err != nil {
+				requestID := c.GetString("RequestID")
+				
+				logger.Get().Error("Panic Recovered",
+					zap.String("request_id", requestID),
+					zap.Any("error", err),
+					zap.String("stack_trace", string(debug.Stack())),
+				)
 
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+					"error":      "Internal Server Error",
+					"request_id": requestID,
+				})
+			}
+		}()
+
+		start := time.Now()
 		c.Next()
 
+		// Handle errors attached to context via c.Error(err)
 		if len(c.Errors) > 0 {
-			err := c.Errors.Last()
-			logger.Get().Error().
-				Str("request_id", requestID).
-				Str("error_type", "API_ERROR").
-				Int64("duration_ms", time.Since(start).Milliseconds()).
-				Msg(err.Error())
+			requestID := c.GetString("RequestID")
+			duration := time.Since(start).Milliseconds()
 
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error_id": requestID,
-				"message":  "An unexpected error occurred",
-			})
+			for _, e := range c.Errors {
+				logger.Get().Error("Request Error",
+					zap.String("request_id", requestID),
+					zap.String("error_type", "BusinessLogicError"),
+					zap.Int64("duration_ms", duration),
+					zap.Error(e.Err),
+				)
+			}
 		}
 	}
 }
