@@ -1,49 +1,43 @@
 package repository
 
 import (
+	"context"
 	"github.com/Sidarth-Roy/NorthStar-Intelligence/Backend/pkg/model"
 	"gorm.io/gorm"
 )
 
 type ProductRepository interface {
-	Create(p *model.Product) error
-	GetByID(id uint) (*model.Product, error)
-	GetAll() ([]model.Product, error)
-	Update(p *model.Product) error
-	Delete(id uint) error
+	Create(ctx context.Context, p *model.Product) error
+	GetByID(ctx context.Context, id uint) (*model.Product, error)
+	GetAll(ctx context.Context) ([]model.Product, error)
+	Update(ctx context.Context, p *model.Product) error
+	Delete(ctx context.Context, id uint) error
 }
 
-type productRepo struct {
-	db *gorm.DB
+type productRepo struct{ db *gorm.DB }
+
+func NewProductRepo(db *gorm.DB) ProductRepository { return &productRepo{db} }
+
+func (r *productRepo) Create(ctx context.Context, p *model.Product) error {
+	return r.db.WithContext(ctx).Create(p).Error
 }
 
-func NewProductRepo(db *gorm.DB) ProductRepository {
-	return &productRepo{db: db}
-}
-
-func (r *productRepo) Create(p *model.Product) error {
-	return r.db.Create(p).Error
-}
-
-func (r *productRepo) GetByID(id uint) (*model.Product, error) {
+func (r *productRepo) GetByID(ctx context.Context, id uint) (*model.Product, error) {
 	var p model.Product
-	if err := r.db.First(&p, id).Error; err != nil {
-		return nil, err
-	}
-	return &p, nil
+	err := r.db.WithContext(ctx).First(&p, id).Error
+	return &p, err
 }
 
-func (r *productRepo) GetAll() ([]model.Product, error) {
+func (r *productRepo) GetAll(ctx context.Context) ([]model.Product, error) {
 	var products []model.Product
-	err := r.db.Where("active = ?", true).Find(&products).Error
+	err := r.db.WithContext(ctx).Find(&products).Error
 	return products, err
 }
 
-func (r *productRepo) Update(p *model.Product) error {
-	return r.db.Save(p).Error
+func (r *productRepo) Update(ctx context.Context, p *model.Product) error {
+	return r.db.WithContext(ctx).Save(p).Error
 }
 
-func (r *productRepo) Delete(id uint) error {
-	// GORM handles soft delete automatically because of gorm.DeletedAt in Base
-	return r.db.Delete(&model.Product{}, id).Error
+func (r *productRepo) Delete(ctx context.Context, id uint) error {
+	return r.db.WithContext(ctx).Delete(&model.Product{}, id).Error
 }
