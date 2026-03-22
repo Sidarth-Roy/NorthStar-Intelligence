@@ -272,3 +272,88 @@ I can help you:
 * Add **Docker + deployment setup**
 
 Just tell me 👍
+
+
+
+Testing a Go server requires a multi-layered approach to ensure that your business logic is correct, your database queries work, and your API remains stable as you add new features.
+
+In a professional environment, we use the **Testing Pyramid** strategy: a lot of fast unit tests, fewer integration tests, and even fewer end-to-end tests.
+
+
+
+---
+
+### 1. Unit Testing (Service Layer)
+**Goal:** Test your business logic in isolation without a real database.
+* **Target:** `internal/service/`
+* **How:** Use **Mocks**. You mock the Repository interface so you can simulate "Database Success," "Record Not Found," or "Database Connection Error" without actually running Postgres.
+* **Tools:** `testing` (built-in), `testify/mock`, or `mockery`.
+
+> **Example:** Test that `ProductService.Create` returns an error if the unit price is negative, before it even touches the database.
+
+---
+
+### 2. Integration Testing (Repository Layer)
+**Goal:** Ensure your GORM queries and database constraints (like Foreign Keys) actually work.
+* **Target:** `internal/repository/`
+* **How:** Use a **Test Database**. Traditionally, developers used SQLite in-memory, but the modern industry standard is **Testcontainers**.
+* **Process:** 1. Start a real Docker container of PostgreSQL.
+    2. Run migrations.
+    3. Execute the repository method.
+    4. Assert the data exists in the DB.
+    5. Wipe the data.
+
+---
+
+### 3. API/HTTP Testing (Controller Layer)
+**Goal:** Verify that your routing, JSON binding, and middleware (like RequestID) are working.
+* **Target:** `internal/api/v1/`
+* **How:** Use `net/http/httptest`. You don't need to start the actual network server; Gin allows you to "perform" a request against the router engine in memory.
+
+**Example Code for `product_controller_test.go`:**
+```go
+func TestGetProduct(t *testing.T) {
+    // 1. Setup Gin in Test Mode
+    gin.SetMode(gin.TestMode)
+    
+    // 2. Setup Router with Mocks or Real Container
+    router := api.SetupRouter(mockContainer)
+
+    // 3. Record the HTTP Response
+    w := httptest.NewRecorder()
+    req, _ := http.NewRequest("GET", "/api/v1/products/1", nil)
+    router.ServeHTTP(w, req)
+
+    // 4. Assert
+    assert.Equal(t, http.StatusOK, w.Code)
+}
+```
+
+---
+
+### 4. End-to-End (E2E) Testing
+**Goal:** Test the "Happy Path" from the outside, exactly like a user or frontend would.
+* **How:** Use a tool like **Postman**, **Insomnia**, or a simple shell script with `cURL`.
+* **Scenario:** 1. Create a Category.
+    2. Create a Product using that Category ID.
+    3. Create an Order containing that Product.
+    4. Verify the Order exists and the Product quantity is correct.
+
+---
+
+### 5. Load & Performance Testing
+**Goal:** Find the breaking point of your server.
+* **Tools:** `k6` (JavaScript-based, very popular for Go devs) or `wrk`.
+* **What to check:** How many "Orders per second" can your server handle before latency exceeds 200ms?
+
+---
+
+### Summary Checklist for your Project
+
+| Test Level | Focus Area | Speed | Real DB? |
+| :--- | :--- | :--- | :--- |
+| **Unit** | Service Logic / Validation | Ultra Fast | No (Mocks) |
+| **Integration** | SQL Queries / GORM | Medium | Yes (Docker) |
+| **API** | JSON / HTTP Status Codes | Fast | Optional |
+| **E2E** | Full Business Flow | Slow | Yes |
+
