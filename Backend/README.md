@@ -15,6 +15,12 @@ Backend/
 │   │       ├── shipper_controller.go
 │   │       └── order_controller.go      # Handles both Order & OrderDetails
 │   ├── service/
+│   │   ├── product_service_test.go
+│   │   ├── category_service_test.go
+│   │   ├── customer_service_test.go
+│   │   ├── employee_service_test.go
+│   │   ├── shipper_service_test.go
+│   │   ├── order_service_test.go         
 │   │   ├── product_service.go
 │   │   ├── category_service.go
 │   │   ├── customer_service.go
