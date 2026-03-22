@@ -1,8 +1,10 @@
 Backend/
 ├── cmd/
 │   └── api/
-│       └── main.go                 # Entry point, Dependency Injection & Graceful Shutdown
+│       ├── main.go                 # Entry point & Graceful Shutdown
 ├── internal/
+│   ├── app/
+│   │   └── container.go            # Dependency Injection
 │   ├── api/
 │   │   ├── router.go               # Centralized Route Registry (v1)
 │   │   └── v1/

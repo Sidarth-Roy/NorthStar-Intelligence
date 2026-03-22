@@ -9,9 +9,7 @@ import (
 	"time"
 
 	"github.com/Sidarth-Roy/NorthStar-Intelligence/Backend/internal/api"
-	"github.com/Sidarth-Roy/NorthStar-Intelligence/Backend/internal/api/v1"
-	"github.com/Sidarth-Roy/NorthStar-Intelligence/Backend/internal/repository"
-	"github.com/Sidarth-Roy/NorthStar-Intelligence/Backend/internal/service"
+	"github.com/Sidarth-Roy/NorthStar-Intelligence/Backend/internal/app"
 	"github.com/Sidarth-Roy/NorthStar-Intelligence/Backend/pkg/config"
 	"github.com/Sidarth-Roy/NorthStar-Intelligence/Backend/pkg/db"
 	"github.com/Sidarth-Roy/NorthStar-Intelligence/Backend/pkg/logger"
@@ -28,39 +26,11 @@ func main() {
 	database := db.GetDB(cfg.DatabaseURL)
 
 	// 3. DI Setup
-	// Products
-	prodRepo := repository.NewProductRepo(database)
-	prodSvc := service.NewProductSvc(prodRepo)
-	prodCtrl := v1.NewProductController(prodSvc)
-
-	// Categories (New Addition)
-	catRepo := repository.NewCategoryRepo(database)
-	catSvc := service.NewCategorySvc(catRepo)
-	catCtrl := v1.NewCategoryController(catSvc)
-
-	// Customers
-	custRepo := repository.NewCustomerRepo(database)
-	custSvc := service.NewCustomerSvc(custRepo)
-	custCtrl := v1.NewCustomerController(custSvc)
-
-	// Employees
-	empRepo := repository.NewEmployeeRepo(database)
-	empSvc := service.NewEmployeeSvc(empRepo)
-	empCtrl := v1.NewEmployeeController(empSvc)
-
-	// Shippers
-	shipRepo := repository.NewShipperRepo(database)
-	shipSvc := service.NewShipperSvc(shipRepo)
-	shipCtrl := v1.NewShipperController(shipSvc)
-
-	// Orders
-	orderRepo := repository.NewOrderRepo(database)
-	orderSvc := service.NewOrderSvc(orderRepo)
-	orderCtrl := v1.NewOrderController(orderSvc)
+	container := app.NewAppContainer(database)
 	
 	// 4. Router Setup
-	router := api.SetupRouter(prodCtrl, catCtrl, custCtrl, empCtrl, shipCtrl, orderCtrl)
-	
+	router := api.SetupRouter(container)	
+
 	// 5. Server Configuration
 	srv := &http.Server{
 		Addr:    ":" + cfg.Port,

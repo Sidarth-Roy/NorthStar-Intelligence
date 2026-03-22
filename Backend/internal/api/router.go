@@ -1,19 +1,12 @@
 package api
 
 import (
-	"github.com/Sidarth-Roy/NorthStar-Intelligence/Backend/internal/api/v1"
+	"github.com/Sidarth-Roy/NorthStar-Intelligence/Backend/internal/app"
 	"github.com/Sidarth-Roy/NorthStar-Intelligence/Backend/internal/middleware"
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRouter(
-	prodCtrl *v1.ProductController, 
-	catCtrl *v1.CategoryController,
-	custCtrl *v1.CustomerController,
-	empCtrl *v1.EmployeeController,
-	shipCtrl *v1.ShipperController,
-	orderCtrl *v1.OrderController,
-) *gin.Engine {
+func SetupRouter(deps *app.AppContainer) *gin.Engine {
 	r := gin.New()
 
 	// 1. Traceability Middleware
@@ -30,56 +23,56 @@ func SetupRouter(
 		// Product Routes
 		productRoutes := apiV1.Group("/products")
 		{
-			productRoutes.GET("", prodCtrl.GetAll)
-			productRoutes.GET("/:id", prodCtrl.GetByID)
-			productRoutes.POST("", prodCtrl.Create)
-			productRoutes.PUT("/:id", prodCtrl.Update)
-			productRoutes.DELETE("/:id", prodCtrl.Delete)
+			productRoutes.GET("", deps.ProductCtrl.GetAll)
+			productRoutes.GET("/:id", deps.ProductCtrl.GetByID)
+			productRoutes.POST("", deps.ProductCtrl.Create)
+			productRoutes.PUT("/:id", deps.ProductCtrl.Update)
+			productRoutes.DELETE("/:id", deps.ProductCtrl.Delete)
 		}
 		// Category Routes
 		categoryRoutes := apiV1.Group("/categories")
 		{
-			categoryRoutes.GET("", catCtrl.GetAll)
-			categoryRoutes.GET("/:id", catCtrl.GetByID)
-			categoryRoutes.POST("", catCtrl.Create)
-			categoryRoutes.PUT("/:id", catCtrl.Update)
-			categoryRoutes.DELETE("/:id", catCtrl.Delete)
+			categoryRoutes.GET("", deps.CategoryCtrl.GetAll)
+			categoryRoutes.GET("/:id", deps.CategoryCtrl.GetByID)
+			categoryRoutes.POST("", deps.CategoryCtrl.Create)
+			categoryRoutes.PUT("/:id", deps.CategoryCtrl.Update)
+			categoryRoutes.DELETE("/:id", deps.CategoryCtrl.Delete)
 		}
 		// Customer Routes
 		customerRoutes := apiV1.Group("/customers")
 		{
-			customerRoutes.GET("", custCtrl.GetAll)
-			customerRoutes.GET("/:id", custCtrl.GetByID)
-			customerRoutes.POST("", custCtrl.Create)
-			customerRoutes.PUT("/:id", custCtrl.Update)
-			customerRoutes.DELETE("/:id", custCtrl.Delete)
+			customerRoutes.GET("", deps.CustomerCtrl.GetAll)
+			customerRoutes.GET("/:id", deps.CustomerCtrl.GetByID)
+			customerRoutes.POST("", deps.CustomerCtrl.Create)
+			customerRoutes.PUT("/:id", deps.CustomerCtrl.Update)
+			customerRoutes.DELETE("/:id", deps.CustomerCtrl.Delete)
 		}
 		// Employee Routes
 		employeeRoutes := apiV1.Group("/employees")
 		{
-			employeeRoutes.GET("", empCtrl.GetAll)
-			employeeRoutes.GET("/:id", empCtrl.GetByID)
-			employeeRoutes.POST("", empCtrl.Create)
-			employeeRoutes.PUT("/:id", empCtrl.Update)
-			employeeRoutes.DELETE("/:id", empCtrl.Delete)
+			employeeRoutes.GET("", deps.EmployeeCtrl.GetAll)
+			employeeRoutes.GET("/:id", deps.EmployeeCtrl.GetByID)
+			employeeRoutes.POST("", deps.EmployeeCtrl.Create)
+			employeeRoutes.PUT("/:id", deps.EmployeeCtrl.Update)
+			employeeRoutes.DELETE("/:id", deps.EmployeeCtrl.Delete)
 		}
 		// Shipper Routes
 		shipperRoutes := apiV1.Group("/shippers")
 		{
-			shipperRoutes.GET("", shipCtrl.GetAll)
-			shipperRoutes.GET("/:id", shipCtrl.GetByID)
-			shipperRoutes.POST("", shipCtrl.Create)
-			shipperRoutes.PUT("/:id", shipCtrl.Update)
-			shipperRoutes.DELETE("/:id", shipCtrl.Delete)
+			shipperRoutes.GET("", deps.ShipperCtrl.GetAll)
+			shipperRoutes.GET("/:id", deps.ShipperCtrl.GetByID)
+			shipperRoutes.POST("", deps.ShipperCtrl.Create)
+			shipperRoutes.PUT("/:id", deps.ShipperCtrl.Update)
+			shipperRoutes.DELETE("/:id", deps.ShipperCtrl.Delete)
 		}
 		// Order Routes
 		orderRoutes := apiV1.Group("/orders")
 		{
-			orderRoutes.GET("", orderCtrl.GetAll)
-			orderRoutes.GET("/:id", orderCtrl.GetByID)
-			orderRoutes.POST("", orderCtrl.Create)
-			orderRoutes.PUT("/:id", orderCtrl.Update)
-			orderRoutes.DELETE("/:id", orderCtrl.Delete)
+			orderRoutes.GET("", deps.OrderCtrl.GetAll)
+			orderRoutes.GET("/:id", deps.OrderCtrl.GetByID)
+			orderRoutes.POST("", deps.OrderCtrl.Create)
+			orderRoutes.PUT("/:id", deps.OrderCtrl.Update)
+			orderRoutes.DELETE("/:id", deps.OrderCtrl.Delete)
 		}
 	}
 
