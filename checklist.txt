@@ -1,0 +1,73 @@
+1. The Entry Point (Middleware & Safety)
+    1. Rate Limiting
+    2. Security Headers
+    3. CORS Configuration
+    4. Request Logging
+2. Identity & Access (The Gatekeepers)
+    1. Authentication
+    2. Authorization
+3. Routing & Input Handling
+    1. Router
+    2. Input Validation (DTOs)
+4. The Core Logic
+    1. Controller
+    2. Service Layer
+    3. Abstraction (Repository Pattern)
+5. Data & Persistence
+    1. Models/Entities
+    2. ORM/Query Builder
+    3. Database (DB connection pooling)
+    4. Caching
+6. The Outbound Path
+    1. Response DTOs
+    2. Response Headers
+    3. Global Exception Handling
+    4. Return to Client
+7. Throughout the Project (The "Must-Haves")
+    1. Environment Configuration
+    2. Structured Logging
+    3. Graceful Shutdown
+    4. Health Checks
+    5. API Documentation
+
+The Gin Flow
+1. Global Middleware (Security & Logging)
+    1. Recovery
+    2. Logger
+    3. Security Headers
+    4. CORS
+2. Routing & Auth Groups
+    1. Public Group
+    2. Private Group
+3. Controller Layer (Input & DTOs)
+    1. Binding
+    2. Validation
+    3. Rejection
+4. Service Layer (The Brain)
+    1. Dependency Injection
+    2. Context
+    3. Logic
+5. Repository Layer (The Data)
+    1. ORM (GORM)
+    2. Raw SQL
+    3. Mapping
+6. Response Handling
+    1. Standardized Format
+    2. Status Codes
+7. Throughout the Project (Go Best Practices)
+    1. Centralized Error Handling
+    2. Environment Specs
+    3. Graceful Shutdown
+    4. Interfaces for Testing
+
+
+├── cmd/api/main.go      # Entry point (initializes DB, Router, DI)
+├── internal/
+│   ├── api/             # Gin Routes & Middlewares
+│   ├── controller/      # Gin Context handlers (Input/Output)
+│   ├── service/         # Business Logic (Interface driven)
+│   ├── repository/      # DB Queries (GORM/sqlx/pgx)
+│   ├── model/           # Database Entities
+│   └── dto/             # Request/Response structs & Validation
+├── pkg/                 # Shared utilities (logger, utils)
+└── .env                 # Configurations
