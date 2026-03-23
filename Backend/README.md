@@ -1,7 +1,13 @@
 Backend/
 ├── cmd/
 │   └── api/
-│       ├── main.go                 # Entry point & Graceful Shutdown
+│       └── main.go                 # Entry point & Graceful Shutdown
+├── DB/                
+│   ├── seeder_main.go              # Your seeding script
+│   ├── seeder                      # Your seeding script
+│   │   └── seed.go            
+│   └── Northwind_Traders_Kaggle_Dataset_CSV/              # Your raw data files
+│       └── categories.csv            
 ├── internal/
 │   ├── app/
 │   │   └── container.go            # Dependency Injection
@@ -51,8 +57,13 @@ Backend/
 │   │   └── zap.go                   # Structured logging (Uber-Zap)
 │   ├── config/
 │   │   └── config.go                # Env loader
-│   └── model/
-│       └── models.go                # All DB Entities & GORM relationships
+│   └── model/                       # All DB Entities & GORM relationships
+│       ├── customer.go
+│       ├── employee.go
+│       ├── model.go
+│       ├── order.go
+│       ├── product.go
+│       └── shipper.go
 ├── .env                             # Database credentials & App Port
 ├── go.mod
 └── go.sum
@@ -74,3 +85,9 @@ Run tests and generate the profile (Ensure the path is correct)
 
 Open the HTML representation
     go tool cover -html=services_coverage
+
+Run tests and generate the profile (Ensure the path is correct)
+    go test ./internal/repository/... -coverprofile=repository_coverage.out
+
+Open the HTML representation
+    go tool cover -html=repository_coverage
