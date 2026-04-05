@@ -20,8 +20,8 @@ func main() {
 	// 1. Load Config & Init Singleton Logger
 	cfg := config.LoadConfig()
 	logger.InitLogger()
+	defer logger.Sync()
 	log := logger.Get()
-
 	// 2. Init Singleton DB
 	database := db.GetDB(cfg.DatabaseURL)
 

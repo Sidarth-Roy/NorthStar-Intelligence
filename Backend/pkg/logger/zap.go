@@ -45,7 +45,7 @@ func InitLogger() {
 		core := zapcore.NewCore(
 			encoder,
 			zapcore.AddSync(os.Stdout),
-			zap.InfoLevel,
+			zap.DebugLevel,
 		)
 
 		// Passing zapcore.LevelEnabler directly here
@@ -58,4 +58,12 @@ func InitLogger() {
 
 func Get() *zap.Logger {
 	return log
+}
+
+// Sync flushes any buffered log entries. 
+// Call this in your main.go: defer logger.Sync()
+func Sync() {
+	if log != nil {
+		_ = log.Sync()
+	}
 }
