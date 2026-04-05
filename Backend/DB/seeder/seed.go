@@ -35,7 +35,8 @@ func RunDatabaseSetup() {
 	Migrate(db)
 
 	// 2. Run Seeding
-	defaultPath := "./DB/Northwind_Traders_Kaggle_Dataset_CSV"
+	// defaultPath := "./Backend/DB/Northwind_Traders_Kaggle_Dataset_CSV"
+	defaultPath := "./Northwind_Traders_Kaggle_Dataset_CSV" 
 	Seed(db, defaultPath)
 }
 
