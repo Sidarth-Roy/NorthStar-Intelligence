@@ -15,5 +15,5 @@ type ProductResponse struct {
 	QuantityPerUnit string  `json:"quantityPerUnit"`
 	CategoryID      uint    `json:"categoryID"`
 	Active          bool    `json:"active"`
-	ModifiedAt      string  `json:"modifiedAt"`
+	// ModifiedAt      string  `json:"modifiedAt"`
 }

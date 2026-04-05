@@ -62,7 +62,11 @@ func (s *productSvc) Delete(ctx context.Context, id uint) error {
 
 func mapToDTO(p *model.Product) *dto.ProductResponse {
 	return &dto.ProductResponse{
-		ID: p.ID, ProductName: p.ProductName, UnitPrice: p.UnitPrice,
-		CategoryID: p.CategoryID, Active: p.Active, ModifiedAt: p.UpdatedAt.String(),
+		ID: p.ID, 
+		ProductName: p.ProductName, 
+		UnitPrice: p.UnitPrice,
+		CategoryID: p.CategoryID, 
+		Active: p.Active, 
+		// ModifiedAt: p.UpdatedAt.String(),
 	}
 }
