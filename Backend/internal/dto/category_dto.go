@@ -5,7 +5,6 @@ package dto
 // 	Description  string `json:"description"`
 // }
 
-
 // Required for POST /categories
 type CategoryCreateReq struct {
 	CategoryName string `json:"categoryName" binding:"required"`

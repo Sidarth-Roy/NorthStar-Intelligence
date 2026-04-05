@@ -28,7 +28,7 @@ func (ctrl *ProductController) GetByID(c *gin.Context) {
 }
 
 func (ctrl *ProductController) Create(c *gin.Context) {
-	var req dto.ProductUpsertReq
+	var req dto.ProductInsertReq
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -40,7 +40,7 @@ func (ctrl *ProductController) Create(c *gin.Context) {
 
 func (ctrl *ProductController) Update(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
-	var req dto.ProductUpsertReq
+	var req dto.ProductUpdateReq
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

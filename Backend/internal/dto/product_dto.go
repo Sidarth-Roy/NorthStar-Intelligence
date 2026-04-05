@@ -1,11 +1,27 @@
 package dto
 
-type ProductUpsertReq struct {
-	ProductName     string  `json:"productName" binding:"required,min=3"`
-	QuantityPerUnit string  `json:"quantityPerUnit"`
-	UnitPrice       float64 `json:"unitPrice" binding:"required,gt=0"`
-	CategoryID      uint    `json:"categoryID" binding:"required"`
+// type ProductUpsertReq struct {
+// 	ProductName     string  `json:"productName" binding:"required,min=3"`
+// 	QuantityPerUnit string  `json:"quantityPerUnit"`
+// 	UnitPrice       float64 `json:"unitPrice" binding:"required,gt=0"`
+// 	CategoryID      uint    `json:"categoryID" binding:"required"`
+// 	Discontinued    int     `json:"discontinued"`
+// }
+
+type ProductInsertReq struct {
+	ProductName     string  `json:"productName" binding:"required"`
+	QuantityPerUnit string  `json:"quantityPerUnit" binding:"required"`
+	UnitPrice       float64 `json:"unitPrice" binding:"required"`
+	CategoryID      uint    `json:"categoryID"`
 	Discontinued    int     `json:"discontinued"`
+}
+
+type ProductUpdateReq struct {
+	ProductName     string  `json:"productName" binding:"required"`
+	QuantityPerUnit string  `json:"quantityPerUnit" binding:"required"`
+	UnitPrice       float64 `json:"unitPrice" binding:"required"`
+	CategoryID      uint    `json:"categoryID" binding:"required"`
+	Discontinued    int     `json:"discontinued" binding:"required"`
 }
 
 type ProductResponse struct {
@@ -14,6 +30,6 @@ type ProductResponse struct {
 	UnitPrice       float64 `json:"unitPrice"`
 	QuantityPerUnit string  `json:"quantityPerUnit"`
 	CategoryID      uint    `json:"categoryID"`
-	Active          bool    `json:"active"`
+	Discontinued    int     `json:"discontinued"`
 	// ModifiedAt      string  `json:"modifiedAt"`
 }
