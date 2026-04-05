@@ -8,17 +8,17 @@ package dto
 
 // Required for POST /categories
 type CategoryCreateReq struct {
-	CategoryName string `json:"categoryName" binding:"required,min=2"`
+	CategoryName string `json:"categoryName" binding:"required"`
 	Description  string `json:"description"`
 }
 
 // Optional for PUT or PATCH /categories/:id
 type CategoryUpdateReq struct {
 	// Use 'omitempty' so it's not required, but if provided, must be min 2 chars
-	CategoryName string `json:"categoryName" binding:"omitempty,min=2"`
-	Description  string `json:"description"`
+	CategoryName string `json:"categoryName" binding:"required"`
+	Description  string `json:"description" binding:"required"`
 	// Use a pointer for bools so you can tell the difference between "false" and "missing"
-	Active       *bool  `json:"active"` 
+	Active       *bool  `json:"active" binding:"required"` 
 }
 
 
