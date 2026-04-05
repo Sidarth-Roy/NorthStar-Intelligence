@@ -8,10 +8,10 @@ import (
 )
 
 type ProductService interface {
-	Create(ctx context.Context, req dto.ProductUpsertReq) (*dto.ProductResponse, error)
+	Create(ctx context.Context, req dto.ProductInsertReq) (*dto.ProductResponse, error)
 	Get(ctx context.Context, id uint) (*dto.ProductResponse, error)
 	List(ctx context.Context) ([]dto.ProductResponse, error)
-	Update(ctx context.Context, id uint, req dto.ProductUpsertReq) (*dto.ProductResponse, error)
+	Update(ctx context.Context, id uint, req dto.ProductUpdateReq) (*dto.ProductResponse, error)
 	Delete(ctx context.Context, id uint) error
 }
 
@@ -19,7 +19,7 @@ type productSvc struct{ repo repository.ProductRepository }
 
 func NewProductSvc(r repository.ProductRepository) ProductService { return &productSvc{repo: r} }
 
-func (s *productSvc) Create(ctx context.Context, req dto.ProductUpsertReq) (*dto.ProductResponse, error) {
+func (s *productSvc) Create(ctx context.Context, req dto.ProductInsertReq) (*dto.ProductResponse, error) {
 	p := &model.Product{
 		ProductName: req.ProductName, 
 		UnitPrice: req.UnitPrice, 
@@ -44,13 +44,14 @@ func (s *productSvc) List(ctx context.Context) ([]dto.ProductResponse, error) {
 	return res, nil
 }
 
-func (s *productSvc) Update(ctx context.Context, id uint, req dto.ProductUpsertReq) (*dto.ProductResponse, error) {
+func (s *productSvc) Update(ctx context.Context, id uint, req dto.ProductUpdateReq) (*dto.ProductResponse, error) {
 	p, err := s.repo.GetByID(ctx, id)
 	if err != nil { return nil, err }
 	
 	p.ProductName = req.ProductName
 	p.UnitPrice = req.UnitPrice
 	p.CategoryID = req.CategoryID
+	p.Discontinued = req.Discontinued
 	
 	if err := s.repo.Update(ctx, p); err != nil { return nil, err }
 	return mapToDTO(p), nil
@@ -64,9 +65,10 @@ func mapToDTO(p *model.Product) *dto.ProductResponse {
 	return &dto.ProductResponse{
 		ID: p.ID, 
 		ProductName: p.ProductName, 
+		QuantityPerUnit: p.QuantityPerUnit,
 		UnitPrice: p.UnitPrice,
 		CategoryID: p.CategoryID, 
-		Active: p.Active, 
+		Discontinued: p.Discontinued, 
 		// ModifiedAt: p.UpdatedAt.String(),
 	}
 }
