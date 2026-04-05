@@ -148,14 +148,14 @@ func openCSV(path string) [][]string {
 func SeedCategories(db *gorm.DB, path string) {
 	log.Println("📦 Seeding Categories...")
 	rows := openCSV(filepath.Join(path, "categories.csv"))
-	for i, row := range rows {
-		id, err := strconv.Atoi(row[0])
-		if err != nil {
-			log.Printf("⚠️  Row %d: Invalid ID %s, skipping", i, row[0])
-			continue
-		}
+	for _, row := range rows {
+		// id, err := strconv.Atoi(row[0])
+		// if err != nil {
+		// 	log.Printf("⚠️  Row %d: Invalid ID %s, skipping", i, row[0])
+		// 	continue
+		// }
 		res := db.Create(&model.Category{
-			Base:         model.Base{ID: uint(id), Active: true},
+			Base:         model.Base{Active: true},
 			CategoryName: row[1],
 			Description:  row[2],
 		})

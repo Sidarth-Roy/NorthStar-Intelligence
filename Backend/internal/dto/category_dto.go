@@ -10,5 +10,5 @@ type CategoryResponse struct {
 	CategoryName string `json:"categoryName"`
 	Description  string `json:"description"`
 	Active       bool   `json:"active"`
-	ModifiedAt   string `json:"modifiedAt"`
+	// ModifiedAt   string `json:"modifiedAt"`
 }
