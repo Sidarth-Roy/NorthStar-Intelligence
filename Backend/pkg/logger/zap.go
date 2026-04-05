@@ -15,24 +15,43 @@ var (
 
 func InitLogger() {
 	once.Do(func() {
-		encoderConfig := zap.NewProductionEncoderConfig()
-		encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
-		encoderConfig.TimeKey = "timestamp"
-		encoderConfig.LevelKey = "level"
-		encoderConfig.MessageKey = "message"
-		encoderConfig.CallerKey = "caller"      // Shows file:line
-		encoderConfig.FunctionKey = "func"      // Shows function name
+		var encoder zapcore.Encoder
+		var stacktraceLevel zapcore.LevelEnabler
+		
+		env := os.Getenv("APP_ENV")
+
+		if env == "production" {
+			// --- PRODUCTION: Keep your original JSON logic ---
+			encoderConfig := zap.NewProductionEncoderConfig()
+			encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+			encoderConfig.TimeKey = "timestamp"
+			encoderConfig.LevelKey = "level"
+			encoderConfig.MessageKey = "message"
+			encoderConfig.CallerKey = "caller"
+			encoderConfig.FunctionKey = "func"
+			
+			encoder = zapcore.NewJSONEncoder(encoderConfig)
+			stacktraceLevel = zapcore.ErrorLevel // Stacktrace on every error
+		} else {
+			// --- DEVELOPMENT: Optimized for readability ---
+			encoderConfig := zap.NewDevelopmentEncoderConfig()
+			encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder // Adds colors
+			encoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout("15:04:05") // Just the time
+			
+			encoder = zapcore.NewConsoleEncoder(encoderConfig)
+			stacktraceLevel = zapcore.DPanicLevel // No stacktraces for standard Errors
+		}
 
 		core := zapcore.NewCore(
-			zapcore.NewJSONEncoder(encoderConfig),
+			encoder,
 			zapcore.AddSync(os.Stdout),
 			zap.InfoLevel,
 		)
 
-		// AddCaller adds the file/line, AddStacktrace adds trace on Errors
-		log = zap.New(core, zap.AddCaller(), zap.AddStacktrace(zap.ErrorLevel)).With(
+		// Passing zapcore.LevelEnabler directly here
+		log = zap.New(core, zap.AddCaller(), zap.AddStacktrace(stacktraceLevel)).With(
 			zap.String("service", "northstar-backend"),
-			zap.String("environment", os.Getenv("APP_ENV")),
+			zap.String("environment", env),
 		)
 	})
 }
