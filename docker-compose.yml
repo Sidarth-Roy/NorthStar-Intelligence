@@ -22,33 +22,33 @@ services:
 
   # New Seeder Service
   seeder:
-    image: golang:1.21-alpine # Use the Go version matching your project
+    image: golang:1.25-alpine # Use the Go version matching your project
     container_name: northstar_seeder
     volumes:
       - .:/app # Mounts your current directory (including seed.go)
-    working_dir: /app/DB
+    working_dir: /app/Backend/DB
     environment:
       - DB_HOST=db
       - DB_USER=user
       - DB_PASSWORD=password
       - DB_NAME=northwind
     # Run the seed command and exit when finished
-    command: go run seed.go
+    command: go run seeder_main.go
     depends_on:
       db:
         condition: service_healthy # Only runs after healthcheck passes
 
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: northstar_pgadmin
-    restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-    ports:
-      - "8080:80"
-    depends_on:
-      - db
+  # pgadmin:
+  #   image: dpage/pgadmin4
+  #   container_name: northstar_pgadmin
+  #   restart: always
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: admin@admin.com
+  #     PGADMIN_DEFAULT_PASSWORD: admin
+  #   ports:
+  #     - "8080:80"
+  #   depends_on:
+  #     - db
 
 volumes:
   postgres_data:
