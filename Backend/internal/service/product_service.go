@@ -49,9 +49,12 @@ func (s *productSvc) Update(ctx context.Context, id uint, req dto.ProductUpdateR
 	if err != nil { return nil, err }
 	
 	p.ProductName = req.ProductName
+	p.QuantityPerUnit = req.QuantityPerUnit
 	p.UnitPrice = req.UnitPrice
 	p.CategoryID = req.CategoryID
-	p.Discontinued = req.Discontinued
+	if req.Discontinued != nil {
+		p.Discontinued = *req.Discontinued
+	}
 	
 	if err := s.repo.Update(ctx, p); err != nil { return nil, err }
 	return mapToDTO(p), nil

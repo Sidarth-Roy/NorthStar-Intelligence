@@ -10,8 +10,8 @@ package dto
 
 type ProductInsertReq struct {
 	ProductName     string  `json:"productName" binding:"required"`
-	QuantityPerUnit string  `json:"quantityPerUnit" binding:"required"`
-	UnitPrice       float64 `json:"unitPrice" binding:"required"`
+	QuantityPerUnit string  `json:"quantityPerUnit"`
+	UnitPrice       float64 `json:"unitPrice"`
 	CategoryID      uint    `json:"categoryID"`
 	Discontinued    int     `json:"discontinued"`
 }
@@ -21,7 +21,7 @@ type ProductUpdateReq struct {
 	QuantityPerUnit string  `json:"quantityPerUnit" binding:"required"`
 	UnitPrice       float64 `json:"unitPrice" binding:"required"`
 	CategoryID      uint    `json:"categoryID" binding:"required"`
-	Discontinued    int     `json:"discontinued" binding:"required"`
+	Discontinued    *int     `json:"discontinued" binding:"required"`
 }
 
 type ProductResponse struct {
