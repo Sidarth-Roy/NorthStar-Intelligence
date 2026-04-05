@@ -66,10 +66,10 @@ func Seed(db *gorm.DB, csvBasePath string) {
 	log.Println("--- 🌱 Seeding Database ---")
 
 	SeedCategories(db, csvBasePath)
+	SeedProducts(db, csvBasePath)
 	SeedShippers(db, csvBasePath)
 	SeedCustomers(db, csvBasePath)
 	SeedEmployees(db, csvBasePath)
-	SeedProducts(db, csvBasePath)
 	SeedOrders(db, csvBasePath)
 	SeedOrderDetails(db, csvBasePath)
 
@@ -166,6 +166,29 @@ func SeedCategories(db *gorm.DB, path string) {
 	}
 }
 
+func SeedProducts(db *gorm.DB, path string) {
+	log.Println("🍎 Seeding Products...")
+	rows := openCSV(filepath.Join(path, "products.csv"))
+	for _, row := range rows {
+		// id, _ := strconv.Atoi(row[0])
+		price, _ := strconv.ParseFloat(row[3], 64)
+		disc, _ := strconv.Atoi(row[4])
+		catID, _ := strconv.Atoi(row[5])
+		
+		err := db.Create(&model.Product{
+			Base:            model.Base{Active: true},
+			ProductName:     row[1],
+			QuantityPerUnit: row[2],
+			UnitPrice:       price,
+			Discontinued:    disc,
+			CategoryID:      uint(catID),
+		}).Error
+		if err != nil {
+			log.Printf("❌ Failed to create product %s: %v", row[1], err)
+		}
+	}
+}
+
 func SeedShippers(db *gorm.DB, path string) {
 	log.Println("🚚 Seeding Shippers...")
 	rows := openCSV(filepath.Join(path, "shippers.csv"))
@@ -222,29 +245,6 @@ func SeedEmployees(db *gorm.DB, path string) {
 			Country:      row[4],
 			ReportsTo:    reportsTo,
 		})
-	}
-}
-
-func SeedProducts(db *gorm.DB, path string) {
-	log.Println("🍎 Seeding Products...")
-	rows := openCSV(filepath.Join(path, "products.csv"))
-	for _, row := range rows {
-		id, _ := strconv.Atoi(row[0])
-		price, _ := strconv.ParseFloat(row[3], 64)
-		disc, _ := strconv.Atoi(row[4])
-		catID, _ := strconv.Atoi(row[5])
-		
-		err := db.Create(&model.Product{
-			Base:            model.Base{ID: uint(id), Active: true},
-			ProductName:     row[1],
-			QuantityPerUnit: row[2],
-			UnitPrice:       price,
-			Discontinued:    disc,
-			CategoryID:      uint(catID),
-		}).Error
-		if err != nil {
-			log.Printf("❌ Failed to create product %s: %v", row[1], err)
-		}
 	}
 }
 	
