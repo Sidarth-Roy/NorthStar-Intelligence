@@ -63,6 +63,6 @@ func mapCategoryToDTO(c *model.Category) *dto.CategoryResponse {
 		CategoryName: c.CategoryName,
 		Description:  c.Description,
 		Active:       c.Active,
-		ModifiedAt:   c.UpdatedAt.String(),
+		// ModifiedAt:   c.UpdatedAt.String(),
 	}
 }
