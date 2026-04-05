@@ -8,11 +8,11 @@ import (
 )
 
 type CategoryService interface {
-	Create(ctx context.Context, req dto.CategoryUpsertReq) (*dto.CategoryResponse, error)
+	Create(ctx context.Context, req dto.CategoryCreateReq) (*dto.CategoryResponse, error)
 	Get(ctx context.Context, id uint) (*dto.CategoryResponse, error)
 	List(ctx context.Context) ([]dto.CategoryResponse, error)
 	GetWithProducts(ctx context.Context, id uint) (*dto.CategoryWithProductsResponse, error)
-	Update(ctx context.Context, id uint, req dto.CategoryUpsertReq) (*dto.CategoryResponse, error)
+	Update(ctx context.Context, id uint, req dto.CategoryUpdateReq) (*dto.CategoryResponse, error)
 	Delete(ctx context.Context, id uint) error
 }
 
@@ -20,7 +20,7 @@ type categorySvc struct{ repo repository.CategoryRepository }
 
 func NewCategorySvc(r repository.CategoryRepository) CategoryService { return &categorySvc{repo: r} }
 
-func (s *categorySvc) Create(ctx context.Context, req dto.CategoryUpsertReq) (*dto.CategoryResponse, error) {
+func (s *categorySvc) Create(ctx context.Context, req dto.CategoryCreateReq) (*dto.CategoryResponse, error) {
 	c := &model.Category{
 		CategoryName: req.CategoryName,
 		Description:  req.Description,
@@ -58,7 +58,7 @@ func (s *categorySvc) GetWithProducts(ctx context.Context, id uint) (*dto.Catego
 	}, nil
 }
 
-func (s *categorySvc) Update(ctx context.Context, id uint, req dto.CategoryUpsertReq) (*dto.CategoryResponse, error) {
+func (s *categorySvc) Update(ctx context.Context, id uint, req dto.CategoryUpdateReq) (*dto.CategoryResponse, error) {
 	c, err := s.repo.GetByID(ctx, id)
 	if err != nil { return nil, err }
 	

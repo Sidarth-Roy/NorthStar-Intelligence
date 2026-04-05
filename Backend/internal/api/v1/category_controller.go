@@ -35,7 +35,7 @@ func (ctrl *CategoryController) GetWithProducts(c *gin.Context) {
 }
 
 func (ctrl *CategoryController) Create(c *gin.Context) {
-	var req dto.CategoryUpsertReq
+	var req dto.CategoryCreateReq
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -47,7 +47,7 @@ func (ctrl *CategoryController) Create(c *gin.Context) {
 
 func (ctrl *CategoryController) Update(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
-	var req dto.CategoryUpsertReq
+	var req dto.CategoryUpdateReq
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
