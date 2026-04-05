@@ -14,4 +14,6 @@ type Product struct {
 	UnitPrice       float64 `gorm:"column:unit_price" json:"unitPrice"`
 	Discontinued    int     `gorm:"column:discontinued" json:"discontinued"`
 	CategoryID      uint    `gorm:"column:category_id" json:"categoryID"`
+
+	Category        Category `gorm:"foreignKey:CategoryID" json:"category"`
 }
