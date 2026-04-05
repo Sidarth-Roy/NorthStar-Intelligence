@@ -40,6 +40,11 @@ func SetupRouter(deps *app.AppContainer) *gin.Engine {
 			categoryRoutes.PUT("/:id", deps.CategoryCtrl.Update)
 			categoryRoutes.DELETE("/:id", deps.CategoryCtrl.Delete)
 		}
+		// Category Routes
+		categoryWithProductsRoutes := apiV1.Group("/categorieswithproducts")
+		{
+			categoryWithProductsRoutes.GET("/:id", deps.CategoryCtrl.GetWithProducts)
+		}
 		// Customer Routes
 		customerRoutes := apiV1.Group("/customers")
 		{

@@ -27,6 +27,13 @@ func (ctrl *CategoryController) GetByID(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
+func (ctrl *CategoryController) GetWithProducts(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Param("id"))
+	res, err := ctrl.svc.GetWithProducts(c.Request.Context(), uint(id))
+	if err != nil { c.Error(err); return }
+	c.JSON(http.StatusOK, res)
+}
+
 func (ctrl *CategoryController) Create(c *gin.Context) {
 	var req dto.CategoryUpsertReq
 	if err := c.ShouldBindJSON(&req); err != nil {
