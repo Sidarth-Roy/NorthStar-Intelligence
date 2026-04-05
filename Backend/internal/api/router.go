@@ -12,11 +12,13 @@ func SetupRouter(deps *app.AppContainer) *gin.Engine {
 	// 1. Traceability Middleware
 	r.Use(middleware.RequestIDMiddleware())
 	
-	// 2. Exception & Logger Middleware
-	r.Use(middleware.GlobalExceptionHandler())
-	
 	// Standard Gin Logger for Console
 	r.Use(gin.Logger())
+
+	r.Use(gin.Recovery())
+
+	// 2. Exception & Logger Middleware
+	r.Use(middleware.GlobalExceptionHandler())
 
 	apiV1 := r.Group("/api/v1")
 	{
