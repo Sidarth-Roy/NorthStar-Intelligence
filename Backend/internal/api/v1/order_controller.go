@@ -57,3 +57,11 @@ func (ctrl *OrderController) Delete(c *gin.Context) {
 	}
 	c.Status(http.StatusNoContent)
 }
+
+func (ctrl *OrderController) DeleteOrderDetail(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Param("id"))
+	if err := ctrl.svc.DeleteOrderDetail(c.Request.Context(), uint(id)); err != nil {
+		c.Error(err); return
+	}
+	c.Status(http.StatusNoContent)
+}
