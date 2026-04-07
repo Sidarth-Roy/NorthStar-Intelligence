@@ -17,6 +17,10 @@ type OrderService interface {
 	List(ctx context.Context) ([]dto.OrderResponse, error)
 	Update(ctx context.Context, id uint, req dto.OrderUpdateReq) (*dto.OrderResponse, error)
 	Delete(ctx context.Context, id uint) error
+	CreateOrderDetail(ctx context.Context, req dto.OrderDetailInsertReq) error
+	GetOrderDetailByID(ctx context.Context, id uint) (*dto.OrderDetailResponse, error)
+	ListOrderDetails(ctx context.Context) ([]dto.OrderDetailResponse, error)
+	UpdateOrderDetail(ctx context.Context, id uint, req dto.OrderDetailUpdateReq) (*dto.OrderDetailResponse, error)
 	DeleteOrderDetail(ctx context.Context, id uint) error
 }
 
@@ -92,6 +96,52 @@ func (s *orderSvc) Update(ctx context.Context, id uint, req dto.OrderUpdateReq) 
 
 func (s *orderSvc) Delete(ctx context.Context, id uint) error {
 	return s.repo.Delete(ctx, id)
+}
+
+func (s *orderSvc) CreateOrderDetail(ctx context.Context, req dto.OrderDetailInsertReq) error {
+	detail := mapDTOToOrderDetailModel(req)
+	return s.repo.CreateOrderDetail(ctx, detail)
+}
+
+func (s *orderSvc) GetOrderDetailByID(ctx context.Context, id uint) (*dto.OrderDetailResponse, error) {
+	detail, err := s.repo.GetOrderDetailByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return mapOrderDetailToDTO(detail), nil
+}
+
+func (s *orderSvc) ListOrderDetails(ctx context.Context) ([]dto.OrderDetailResponse, error) {
+	details, err := s.repo.ListOrderDetails(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var res []dto.OrderDetailResponse
+	for _, d := range details {
+		res = append(res, *mapOrderDetailToDTO(&d))
+	}
+	return res, nil
+}
+
+func (s *orderSvc) UpdateOrderDetail(ctx context.Context, id uint, req dto.OrderDetailUpdateReq) (*dto.OrderDetailResponse, error) {
+	existingDetail, err := s.repo.GetOrderDetailByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	existingDetail.ProductID = req.ProductID
+	existingDetail.UnitPrice = req.UnitPrice
+	existingDetail.Quantity = req.Quantity
+	existingDetail.Discount = req.Discount
+
+	if err := s.repo.UpdateOrderDetail(ctx, existingDetail); err != nil {
+		return nil, err
+	}
+
+	updatedDetail, err := s.repo.GetOrderDetailByID(ctx, existingDetail.ID)
+	if err != nil {
+		return nil, err
+	}
+	return mapOrderDetailToDTO(updatedDetail), nil
 }
 
 func (s *orderSvc) DeleteOrderDetail(ctx context.Context, id uint) error {
@@ -185,4 +235,26 @@ func formatOptionalDate(t *time.Time) string {
         return "" // or "N/A"
     }
     return t.Format("2006-01-02")
+}
+
+func mapDTOToOrderDetailModel(req dto.OrderDetailInsertReq) *model.OrderDetail {
+	return &model.OrderDetail{
+		OrderID:   req.OrderID,
+		ProductID: req.ProductID,
+		UnitPrice: req.UnitPrice,
+		Quantity:  req.Quantity,
+		Discount:  req.Discount,
+	}
+}
+
+func mapOrderDetailToDTO(d *model.OrderDetail) *dto.OrderDetailResponse {
+	return &dto.OrderDetailResponse{
+		ID:        d.ID,
+		OrderID:   d.OrderID,
+		ProductID: d.ProductID,
+		ProductName: d.Product.ProductName,
+		UnitPrice: d.UnitPrice,
+		Quantity:  d.Quantity,
+		Discount:  d.Discount,
+	}
 }
