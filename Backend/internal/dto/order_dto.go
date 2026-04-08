@@ -37,7 +37,8 @@ type OrderInsertReq struct {
 	ShippedDate  string       	  `json:"shippedDate"`
 	ShipperID    uint             `json:"shipperID" binding:"required"`
 	Freight      float64          `json:"freight" binding:"gte=0"`
-	OrderDetails []OrderDetailReq `json:"orderDetails" binding:"required,dive,required"` // 'dive' validates the nested slice
+	Active       bool             `json:"active"`
+	// OrderDetails []OrderDetailReq `json:"orderDetails" binding:"required,dive,required"` // 'dive' validates the nested slice
 }
 
 type OrderDetailUpdateReq struct {
@@ -56,7 +57,17 @@ type OrderUpdateReq struct {
 	ShippedDate   string       	  `json:"shippedDate"`
 	ShipperID    uint             `json:"shipperID" binding:"required"`
 	Freight      float64          `json:"freight" binding:"gte=0"`
-	OrderDetails []OrderDetailReq `json:"orderDetails" binding:"required,dive,required"` // 'dive' validates the nested slice
+	Active       bool             `json:"active" binding:"required"`
+	// OrderDetails []OrderDetailReq `json:"orderDetails" binding:"required,dive,required"` // 'dive' validates the nested slice
+}
+
+type OrderDetailForNestedResponse struct {
+	ID			uint    `json:"id"`
+	ProductID	uint    `json:"productID"`
+	ProductName string  `json:"productName"`
+	UnitPrice 	float64 `json:"unitPrice"`
+	Quantity  	int     `json:"quantity"`
+	Discount  	float64 `json:"discount"`
 }
 
 type OrderDetailResponse struct {
@@ -83,5 +94,5 @@ type OrderResponse struct {
 	Freight      float64               `json:"freight"`
 	Active       bool                  `json:"active"`
 	// ModifiedAt   string                `json:"modifiedAt"`
-	OrderDetails []OrderDetailResponse `json:"orderDetails"`
+	OrderDetails []OrderDetailForNestedResponse `json:"orderDetails"`
 }
