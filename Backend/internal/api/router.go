@@ -81,6 +81,11 @@ func SetupRouter(deps *app.AppContainer) *gin.Engine {
 			orderRoutes.PUT("/:id", deps.OrderCtrl.Update)
 			orderRoutes.DELETE("/:id", deps.OrderCtrl.Delete)
 		}
+
+		detailRoutes := apiV1.Group("/order-details")
+		{
+			detailRoutes.DELETE("/:id", deps.OrderCtrl.DeleteOrderDetail)
+		}
 	}
 
 	return r

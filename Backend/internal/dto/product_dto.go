@@ -30,6 +30,7 @@ type ProductResponse struct {
 	UnitPrice       float64 `json:"unitPrice"`
 	QuantityPerUnit string  `json:"quantityPerUnit"`
 	CategoryID      uint    `json:"categoryID"`
+	CategoryName    string  `json:"categoryName"`
 	Discontinued    int     `json:"discontinued"`
 	// ModifiedAt      string  `json:"modifiedAt"`
 }

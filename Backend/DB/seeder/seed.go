@@ -26,7 +26,9 @@ func RunDatabaseSetup() {
 		getEnv("DB_SSLMODE", "disable"),
 	)
 
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		DisableForeignKeyConstraintWhenMigrating: true,
+	})
 	if err != nil {
 		log.Fatalf("❌ Critical: Failed to connect to database: %v", err)
 	}
@@ -44,8 +46,17 @@ func Migrate(db *gorm.DB) {
 	log.Println("--- 🛠️  Running Migrations ---")
 	
 	// Optional: Drop existing tables
-	db.Migrator().DropTable(&model.OrderDetail{}, &model.Order{}, &model.Product{}, &model.Employee{}, &model.Customer{}, &model.Shipper{}, &model.Category{})
-
+	// db.Migrator().DropTable(&model.OrderDetail{}, &model.Order{}, &model.Product{}, &model.Employee{}, &model.Customer{}, &model.Shipper{}, &model.Category{})
+	// 1. Drop in correct order (Children first)
+    db.Migrator().DropTable(
+        &model.OrderDetail{}, 
+        &model.Order{}, 
+        &model.Product{}, 
+        &model.Customer{}, 
+        &model.Employee{}, 
+        &model.Shipper{}, 
+        &model.Category{},
+    )
 	err := db.AutoMigrate(
 		&model.Category{}, 
 		&model.Shipper{}, 
@@ -189,22 +200,6 @@ func SeedProducts(db *gorm.DB, path string) {
 	}
 }
 
-func SeedShippers(db *gorm.DB, path string) {
-	log.Println("🚚 Seeding Shippers...")
-	rows := openCSV(filepath.Join(path, "shippers.csv"))
-	for i, row := range rows {
-		id, err := strconv.Atoi(row[0])
-		if err != nil {
-			log.Printf("⚠️  Row %d: Invalid ID %s", i, row[0])
-			continue
-		}
-		db.Create(&model.Shipper{
-			Base:        model.Base{ID: uint(id), Active: true},
-			CompanyName: row[1],
-		})
-	}
-}
-
 func SeedCustomers(db *gorm.DB, path string) {
 	log.Println("👥 Seeding Customers...")
 	rows := openCSV(filepath.Join(path, "customers.csv"))
@@ -217,6 +212,22 @@ func SeedCustomers(db *gorm.DB, path string) {
 			ContactTitle: row[3],
 			City:         row[4],
 			Country:      row[5],
+		})
+	}
+}
+
+func SeedShippers(db *gorm.DB, path string) {
+	log.Println("🚚 Seeding Shippers...")
+	rows := openCSV(filepath.Join(path, "shippers.csv"))
+	for i, row := range rows {
+		id, err := strconv.Atoi(row[0])
+		if err != nil {
+			log.Printf("⚠️  Row %d: Invalid ID %s", i, row[0])
+			continue
+		}
+		db.Create(&model.Shipper{
+			Base:        model.Base{ID: uint(id), Active: true},
+			CompanyName: row[1],
 		})
 	}
 }
@@ -249,39 +260,51 @@ func SeedEmployees(db *gorm.DB, path string) {
 }
 	
 func SeedOrders(db *gorm.DB, path string) {
-	log.Println("📝 Seeding Orders...")
-	layout := "2006-01-02"
-	rows := openCSV(filepath.Join(path, "orders.csv"))
-	for _, row := range rows {
-		id, _ := strconv.Atoi(row[0])
-		eID, _ := strconv.Atoi(row[2])
-		oDate, _ := time.Parse(layout, row[3])
-		rDate, _ := time.Parse(layout, row[4])
-		sID, _ := strconv.Atoi(row[6])
-		f, _ := strconv.ParseFloat(row[7], 64)
-		
-		var sDate *time.Time
-		if row[5] != "" && row[5] != "NULL" {
-			t, err := time.Parse(layout, row[5])
-			if err == nil {
-				sDate = &t
-			}
-		}
+    log.Println("📝 Seeding Orders...")
+    // Ensure this layout matches your CSV exactly (e.g., "1996-07-04")
+    layout := "2006-01-02" 
+    rows := openCSV(filepath.Join(path, "orders.csv"))
+    
+    for _, row := range rows {
+        id, _ := strconv.Atoi(row[0])
+        eID, _ := strconv.Atoi(row[2])
+        
+        // Parse Mandatory Dates
+        oDate, errO := time.Parse(layout, row[3])
+        rDate, errR := time.Parse(layout, row[4])
+        
+        if errO != nil || errR != nil {
+            log.Printf("⚠️  Order ID %d: Date parsing failed, skipping row", id)
+            continue
+        }
 
-		err := db.Create(&model.Order{
-			Base:         model.Base{ID: uint(id), Active: true},
-			CustomerID:   row[1],
-			EmployeeID:   uint(eID),
-			OrderDate:    oDate,
-			RequiredDate: rDate,
-			ShippedDate:  sDate,
-			ShipperID:    uint(sID),
-			Freight:      f,
-		}).Error
-		if err != nil {
-			log.Printf("❌ Order ID %d insert failed: %v", id, err)
-		}
-	}
+        sID, _ := strconv.Atoi(row[6])
+        f, _ := strconv.ParseFloat(row[7], 64)
+        
+        // Handle Optional ShippedDate
+        var sDate *time.Time
+        if row[5] != "" && row[5] != "NULL" {
+            t, err := time.Parse(layout, row[5])
+            if err == nil {
+                sDate = &t
+            }
+        }
+
+        order := model.Order{
+            Base:         model.Base{ID: uint(id), Active: true},
+            CustomerID:   row[1],
+            EmployeeID:   uint(eID),
+            OrderDate:    oDate,
+            RequiredDate: rDate,
+            ShippedDate:  sDate,
+            ShipperID:    uint(sID),
+            Freight:      f,
+        }
+
+        if err := db.Create(&order).Error; err != nil {
+            log.Printf("❌ Order ID %d insert failed: %v", id, err)
+        }
+    }
 }
 
 func SeedOrderDetails(db *gorm.DB, path string) {

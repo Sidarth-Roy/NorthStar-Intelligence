@@ -71,6 +71,7 @@ func mapToDTO(p *model.Product) *dto.ProductResponse {
 		QuantityPerUnit: p.QuantityPerUnit,
 		UnitPrice: p.UnitPrice,
 		CategoryID: p.CategoryID, 
+		CategoryName: p.Category.CategoryName,
 		Discontinued: p.Discontinued, 
 		// ModifiedAt: p.UpdatedAt.String(),
 	}
