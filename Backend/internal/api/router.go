@@ -84,6 +84,10 @@ func SetupRouter(deps *app.AppContainer) *gin.Engine {
 
 		detailRoutes := apiV1.Group("/order-details")
 		{
+			detailRoutes.GET("", deps.OrderCtrl.ListOrderDetails)
+			detailRoutes.GET("/:id", deps.OrderCtrl.GetOrderDetailByID)
+			detailRoutes.POST("", deps.OrderCtrl.CreateOrderDetail)
+			detailRoutes.PUT("/:id", deps.OrderCtrl.UpdateOrderDetail)
 			detailRoutes.DELETE("/:id", deps.OrderCtrl.DeleteOrderDetail)
 		}
 	}

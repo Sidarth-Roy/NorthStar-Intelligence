@@ -12,6 +12,10 @@ type OrderRepository interface {
 	GetAll(ctx context.Context) ([]model.Order, error)
 	Update(ctx context.Context, o *model.Order) error
 	Delete(ctx context.Context, id uint) error
+	CreateOrderDetail(ctx context.Context, d *model.OrderDetail) error
+	GetOrderDetailByID(ctx context.Context, id uint) (*model.OrderDetail, error)
+	ListOrderDetails(ctx context.Context) ([]model.OrderDetail, error)
+	UpdateOrderDetail(ctx context.Context, d *model.OrderDetail) error
 	DeleteOrderDetail(ctx context.Context, id uint) error
 }
 
@@ -62,6 +66,26 @@ func (r *orderRepo) Update(ctx context.Context, o *model.Order) error {
 func (r *orderRepo) Delete(ctx context.Context, id uint) error {
 	// Select ensures we cascade soft-delete to the associated OrderDetails
 	return r.db.WithContext(ctx).Select("OrderDetails").Delete(&model.Order{Base: model.Base{ID: id}}).Error
+}
+
+func (r *orderRepo) CreateOrderDetail(ctx context.Context, d *model.OrderDetail) error {
+	return r.db.WithContext(ctx).Create(d).Error
+}
+
+func (r *orderRepo) GetOrderDetailByID(ctx context.Context, id uint) (*model.OrderDetail, error) {
+	var d model.OrderDetail
+	err := r.db.WithContext(ctx).Preload("Product").First(&d, id).Error
+	return &d, err
+}
+
+func (r *orderRepo) ListOrderDetails(ctx context.Context) ([]model.OrderDetail, error) {
+	var details []model.OrderDetail
+	err := r.db.WithContext(ctx).Preload("Product").Find(&details).Error
+	return details, err
+}
+
+func (r *orderRepo) UpdateOrderDetail(ctx context.Context, d *model.OrderDetail) error {
+	return r.db.WithContext(ctx).Save(d).Error
 }
 
 func (r *orderRepo) DeleteOrderDetail(ctx context.Context, id uint) error {
