@@ -71,18 +71,19 @@ func (s *orderSvc) Update(ctx context.Context, id uint, req dto.OrderUpdateReq) 
 	existingOrder.ShippedDate = parseOptionalDate(req.ShippedDate)
 	existingOrder.ShipperID = req.ShipperID
 	existingOrder.Freight = req.Freight
+	existingOrder.Active = req.Active
 
 	// Replace existing details
-	var updatedDetails []model.OrderDetail
-	for _, detail := range req.OrderDetails {
-		updatedDetails = append(updatedDetails, model.OrderDetail{
-			ProductID: detail.ProductID,
-			UnitPrice: detail.UnitPrice,
-			Quantity:  detail.Quantity,
-			Discount:  detail.Discount,
-		})
-	}
-	existingOrder.OrderDetails = updatedDetails
+	// var updatedDetails []model.OrderDetail
+	// for _, detail := range req.OrderDetails {
+	// 	updatedDetails = append(updatedDetails, model.OrderDetail{
+	// 		ProductID: detail.ProductID,
+	// 		UnitPrice: detail.UnitPrice,
+	// 		Quantity:  detail.Quantity,
+	// 		Discount:  detail.Discount,
+	// 	})
+	// }
+	// existingOrder.OrderDetails = updatedDetails
 
 	if err := s.repo.Update(ctx, existingOrder); err != nil { return nil, err }
 
@@ -175,18 +176,18 @@ func parseOptionalDate(dateStr string) *time.Time {
 
 // Helpers
 func mapDTOToOrderModel(req dto.OrderInsertReq) *model.Order {
-	var details []model.OrderDetail
-	for _, d := range req.OrderDetails {
-		details = append(details, model.OrderDetail{
-			ProductID: d.ProductID,
-			UnitPrice: d.UnitPrice,
-			Quantity:  d.Quantity,
-			Discount:  d.Discount,
-		})
-	}
+	// var details []model.OrderDetail
+	// for _, d := range req.OrderDetails {
+	// 	details = append(details, model.OrderDetail{
+	// 		ProductID: d.ProductID,
+	// 		UnitPrice: d.UnitPrice,
+	// 		Quantity:  d.Quantity,
+	// 		Discount:  d.Discount,
+	// 	})
+	// }
 
 	return &model.Order{
-		Base: 		  model.Base{ID: req.OrderID},
+		Base: 		  model.Base{ID: req.OrderID, Active: req.Active},
 		CustomerID:   req.CustomerID,
 		EmployeeID:   req.EmployeeID,
 		OrderDate:    parseDate(req.OrderDate),
@@ -194,14 +195,14 @@ func mapDTOToOrderModel(req dto.OrderInsertReq) *model.Order {
 		ShippedDate:  parseOptionalDate(req.ShippedDate),
 		ShipperID:    req.ShipperID,
 		Freight:      req.Freight,
-		OrderDetails: details,
+		// OrderDetails: details,
 	}
 }
 
 func mapOrderToDTO(o *model.Order) *dto.OrderResponse {
-	var detailResponses []dto.OrderDetailResponse
+	var detailResponses []dto.OrderDetailForNestedResponse
 	for _, d := range o.OrderDetails {
-		detailResponses = append(detailResponses, dto.OrderDetailResponse{
+		detailResponses = append(detailResponses, dto.OrderDetailForNestedResponse{
 			ID:        d.ID,
 			ProductID: d.ProductID,
 			ProductName: d.Product.ProductName,
@@ -209,6 +210,10 @@ func mapOrderToDTO(o *model.Order) *dto.OrderResponse {
 			Quantity:  d.Quantity,
 			Discount:  d.Discount,
 		})
+	}
+
+	if detailResponses == nil {
+		detailResponses = []dto.OrderDetailForNestedResponse{}
 	}
 
 	return &dto.OrderResponse{
