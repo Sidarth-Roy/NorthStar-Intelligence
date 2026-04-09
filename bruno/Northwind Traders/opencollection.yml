@@ -1,0 +1,10 @@
+opencollection: 1.0.0
+
+info:
+  name: Northwind Traders
+bundled: false
+extensions:
+  bruno:
+    ignore:
+      - node_modules
+      - .git

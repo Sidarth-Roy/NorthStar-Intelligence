@@ -1,0 +1,15 @@
+info:
+  name: Get Order Detail by ID
+  type: http
+  seq: 7
+
+http:
+  method: GET
+  url: http://localhost:8081/api/v1/order-details/250
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

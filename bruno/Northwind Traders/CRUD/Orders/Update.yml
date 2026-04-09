@@ -1,0 +1,35 @@
+info:
+  name: Update
+  type: http
+  seq: 4
+
+http:
+  method: put
+  url: http://localhost:8081/api/v1/orders/10267
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "id": 10267,
+        "customerID": "FRANK",
+        "customerName": "Frankenversand",
+        "employeeID": 4,
+        "employeeName": "Margaret Peacock",
+        "orderDate": "2013-07-29",
+        "requiredDate": "2013-08-26",
+        "shippedDate": "2013-08-06",
+        "shipperID": 1,
+        "shipperName": "Speedy Express",
+        "freight": 208.57,
+        "active": true
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: false
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

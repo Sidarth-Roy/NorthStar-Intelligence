@@ -1,0 +1,28 @@
+info:
+  name: Create
+  type: http
+  seq: 2
+
+http:
+  method: post
+  url: http://localhost:8081/api/v1/employees
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "employeeName": "Test",
+        "title": "Test",
+        "city": "Test",
+        "country": "Test",
+        "reportsTo": null
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: false
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

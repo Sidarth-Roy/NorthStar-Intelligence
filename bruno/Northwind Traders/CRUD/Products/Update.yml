@@ -1,0 +1,35 @@
+info:
+  name: Update
+  type: http
+  seq: 4
+
+http:
+  method: put
+  url: http://localhost:8081/api/v1/products/84
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "productName": "Test4Updated",
+        "unitPrice": 18.6,
+        "quantityPerUnit": "10 boxes x 20 bags Updated",
+        "categoryID": 2,
+        "discontinued": 0
+      }
+      // {
+      //   "productName": "",
+      //   "unitPrice": null,
+      //   "quantityPerUnit": "",
+      //   "categoryID": null,
+      //   "discontinued": null
+      // }
+  auth: inherit
+
+settings:
+  encodeUrl: false
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

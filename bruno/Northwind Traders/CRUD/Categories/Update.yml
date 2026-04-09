@@ -1,0 +1,27 @@
+info:
+  name: Update
+  type: http
+  seq: 3
+
+http:
+  method: put
+  url: http://localhost:8081/api/v1/categories/16
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |2-
+        {
+          "categoryId": 14,
+          "categoryName": "Test3Updated",
+          "description": "Lorem, ipsom.",
+          "active": true
+        }
+  auth: inherit
+
+settings:
+  encodeUrl: false
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,27 @@
+info:
+  name: Create
+  type: http
+  seq: 2
+
+http:
+  method: post
+  url: http://localhost:8081/api/v1/categories
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "categoryId": 13,
+        "categoryName": "Test34",
+        "description": "Lorem, ipsom.",
+        "active": true
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: false
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

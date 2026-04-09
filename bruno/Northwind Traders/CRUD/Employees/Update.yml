@@ -1,0 +1,28 @@
+info:
+  name: Update
+  type: http
+  seq: 4
+
+http:
+  method: put
+  url: http://localhost:8081/api/v1/employees/10
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "employeeName": "Test",
+        "title": "Test",
+        "city": "Test",
+        "country": "Test",
+        "reportsTo": 9
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: false
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

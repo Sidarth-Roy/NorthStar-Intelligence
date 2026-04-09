@@ -1,0 +1,15 @@
+info:
+  name: Delete
+  type: http
+  seq: 5
+
+http:
+  method: delete
+  url: http://localhost:8081/api/v1/products/81
+  auth: inherit
+
+settings:
+  encodeUrl: false
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

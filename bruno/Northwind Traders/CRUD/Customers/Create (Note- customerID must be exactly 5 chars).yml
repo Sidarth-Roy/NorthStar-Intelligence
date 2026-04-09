@@ -1,0 +1,39 @@
+info:
+  name: "Create (Note: customerID must be exactly 5 chars)"
+  type: http
+  seq: 2
+
+http:
+  method: post
+  url: http://localhost:8081/api/v1/customers
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      // {
+      //   "customerID": "TEST2",
+      //   "companyName": "Test",
+      //   "contactName": "Test",
+      //   "contactTitle": "Test",
+      //   "city": "Test",
+      //   "country": "Test"
+      // }
+      {
+        "id": 91,  // extra params make no diff
+        "customerID": "TEST1",
+        "companyName": "Test",
+        "contactName": null,
+        "contactTitle": null,
+        "city": null,
+        "country": null,
+        "active": null
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: false
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

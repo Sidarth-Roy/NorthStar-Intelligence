@@ -1,0 +1,29 @@
+info:
+  name: Create
+  type: http
+  seq: 3
+
+http:
+  method: post
+  url: http://localhost:8081/api/v1/products
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "productID": "33",   //extra params make no difference
+        "productName": "Test6",
+        "quantityPerUnit": "10 boxes x 20 bags",
+        "unitPrice": 18.50,
+        "categoryID": 1,
+        "discontinued": 0
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: false
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

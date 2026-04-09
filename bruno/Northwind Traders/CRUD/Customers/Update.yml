@@ -1,0 +1,31 @@
+info:
+  name: Update
+  type: http
+  seq: 4
+
+http:
+  method: put
+  url: http://localhost:8081/api/v1/customers/2
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "id": 91,  // extra params make no diff
+          "customerID": "ANATR",
+          "companyName": "Ana Trujillo Emparedados y helados",
+          "contactName": "Ana Trujillo",
+          "contactTitle": "Owner",
+          "city": "Mexico City",
+          "country": "Mexico",
+          "active": true
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: false
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
