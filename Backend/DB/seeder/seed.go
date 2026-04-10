@@ -236,7 +236,7 @@ func SeedEmployees(db *gorm.DB, path string) {
 	log.Println("👔 Seeding Employees...")
 	rows := openCSV(filepath.Join(path, "employees.csv"))
 	for _, row := range rows {
-		id, err := strconv.Atoi(row[0])
+		_, err := strconv.Atoi(row[0])
 		if err != nil {
 			continue
 		}
@@ -249,7 +249,7 @@ func SeedEmployees(db *gorm.DB, path string) {
 			}
 		}
 		db.Create(&model.Employee{
-			Base:         model.Base{ID: uint(id), Active: true},
+			Base:         model.Base{Active: true},
 			EmployeeName: row[1],
 			Title:        row[2],
 			City:         row[3],
