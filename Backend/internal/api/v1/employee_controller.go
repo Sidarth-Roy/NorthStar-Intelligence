@@ -28,7 +28,7 @@ func (ctrl *EmployeeController) GetByID(c *gin.Context) {
 }
 
 func (ctrl *EmployeeController) Create(c *gin.Context) {
-	var req dto.EmployeeUpsertReq
+	var req dto.EmployeeInsertReq
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -40,7 +40,7 @@ func (ctrl *EmployeeController) Create(c *gin.Context) {
 
 func (ctrl *EmployeeController) Update(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
-	var req dto.EmployeeUpsertReq
+	var req dto.EmployeeUpdateReq
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
