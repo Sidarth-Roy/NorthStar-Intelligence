@@ -66,6 +66,25 @@ func (s *customerSvc) Delete(ctx context.Context, id uint) error {
 }
 
 func mapCustomerToDTO(c *model.Customer) *dto.CustomerResponse {
+	var mappedOrders []dto.OrderForCustomerNestedResponse
+	for _, o := range c.Orders {
+		mappedOrders = append(mappedOrders, dto.OrderForCustomerNestedResponse{
+			ID:           o.ID,
+			EmployeeID:   o.EmployeeID,
+			EmployeeName: o.Employee.EmployeeName,
+			OrderDate:    o.OrderDate.Format("2006-01-02"),
+			RequiredDate: o.RequiredDate.Format("2006-01-02"),
+			ShippedDate:  formatOptionalDate(o.ShippedDate),
+			ShipperID:    o.ShipperID,
+			ShipperName:  o.Shipper.CompanyName,
+			Freight:      o.Freight,
+			Active:       o.Active,
+		})
+	}
+	if mappedOrders == nil {
+		mappedOrders = []dto.OrderForCustomerNestedResponse{} // Return null instead of empty array if no orders
+	}
+
 	return &dto.CustomerResponse{
 		ID:           c.ID,
 		CustomerID:   c.CustomerID,
@@ -75,6 +94,7 @@ func mapCustomerToDTO(c *model.Customer) *dto.CustomerResponse {
 		City:         c.City,
 		Country:      c.Country,
 		Active:       c.Active,
+		Orders:       mappedOrders,
 		// ModifiedAt:   c.UpdatedAt.String(),
 	}
 }
