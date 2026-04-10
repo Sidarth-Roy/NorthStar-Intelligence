@@ -220,13 +220,13 @@ func SeedShippers(db *gorm.DB, path string) {
 	log.Println("🚚 Seeding Shippers...")
 	rows := openCSV(filepath.Join(path, "shippers.csv"))
 	for i, row := range rows {
-		id, err := strconv.Atoi(row[0])
+		_, err := strconv.Atoi(row[0])
 		if err != nil {
 			log.Printf("⚠️  Row %d: Invalid ID %s", i, row[0])
 			continue
 		}
 		db.Create(&model.Shipper{
-			Base:        model.Base{ID: uint(id), Active: true},
+			Base:        model.Base{Active: true},
 			CompanyName: row[1],
 		})
 	}
