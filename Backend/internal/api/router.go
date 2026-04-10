@@ -1,10 +1,34 @@
 package api
 
 import (
+	"net/http"
 	"github.com/Sidarth-Roy/NorthStar-Intelligence/Backend/internal/app"
 	"github.com/Sidarth-Roy/NorthStar-Intelligence/Backend/internal/middleware"
 	"github.com/gin-gonic/gin"
 )
+
+// Swagger UI HTML template loading via CDN
+const swaggerHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NorthStar API Docs</title>
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui.css" />
+</head>
+<body>
+  <div id="swagger-ui"></div>
+  <script src="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui-bundle.js" crossorigin></script>
+  <script>
+    window.onload = () => {
+      window.ui = SwaggerUIBundle({
+        url: '/docs/openapi.yaml', // Points to your static YAML file
+        dom_id: '#swagger-ui',
+      });
+    };
+  </script>
+</body>
+</html>`
 
 func SetupRouter(deps *app.AppContainer) *gin.Engine {
 	r := gin.New()
@@ -19,6 +43,18 @@ func SetupRouter(deps *app.AppContainer) *gin.Engine {
 
 	// 2. Exception & Logger Middleware
 	r.Use(middleware.GlobalExceptionHandler())
+
+	// --------------------------------------------------------
+	// 📚 SWAGGER DOCS SETUP
+	// --------------------------------------------------------
+	// Expose the YAML file statically
+	r.StaticFile("/docs/openapi.yaml", "./docs/openapi.yaml")
+	
+	// Serve the Swagger UI HTML
+	r.GET("/swagger", func(c *gin.Context) {
+		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(swaggerHTML))
+	})
+	// --------------------------------------------------------
 
 	apiV1 := r.Group("/api/v1")
 	{
