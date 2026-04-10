@@ -24,18 +24,26 @@ func (r *shipperRepo) Create(ctx context.Context, s *model.Shipper) error {
 
 func (r *shipperRepo) GetByID(ctx context.Context, id uint) (*model.Shipper, error) {
 	var s model.Shipper
-	err := r.db.WithContext(ctx).First(&s, id).Error
+	err := r.db.WithContext(ctx).
+				Preload("Orders").
+				Preload("Orders.Customer").
+				Preload("Orders.Shipper").
+				First(&s, id).Error
 	return &s, err
 }
 
 func (r *shipperRepo) GetAll(ctx context.Context) ([]model.Shipper, error) {
 	var shippers []model.Shipper
-	err := r.db.WithContext(ctx).Find(&shippers).Error
+	err := r.db.WithContext(ctx).
+				Preload("Orders").
+				Preload("Orders.Customer").
+				Preload("Orders.Shipper").
+				Find(&shippers).Error
 	return shippers, err
 }
 
 func (r *shipperRepo) Update(ctx context.Context, s *model.Shipper) error {
-	return r.db.WithContext(ctx).Save(s).Error
+    return r.db.WithContext(ctx).Model(s).Select("*").Updates(s).Error
 }
 
 func (r *shipperRepo) Delete(ctx context.Context, id uint) error {
