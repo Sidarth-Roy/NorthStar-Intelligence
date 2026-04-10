@@ -29,6 +29,19 @@ type CustomerUpdateReq struct {
 	Active       bool   `json:"active"`
 }
 
+type OrderForCustomerNestedResponse struct {
+	ID           uint                  `json:"id"`
+	EmployeeID   uint                  `json:"employeeID"`
+	EmployeeName string                `json:"employeeName"`
+	OrderDate    string	               `json:"orderDate"`
+	RequiredDate string	               `json:"requiredDate"`
+	ShippedDate  string	               `json:"shippedDate"`
+	ShipperID    uint                  `json:"shipperID"`
+	ShipperName  string                `json:"shipperName"`
+	Freight      float64               `json:"freight"`
+	Active       bool                  `json:"active"`
+}
+
 type CustomerResponse struct {
 	ID           uint   `json:"id"`
 	CustomerID   string `json:"customerID"`
@@ -38,5 +51,6 @@ type CustomerResponse struct {
 	City         string `json:"city"`
 	Country      string `json:"country"`
 	Active       bool   `json:"active"`
-	ModifiedAt   string `json:"modifiedAt"`
+	Orders		[]OrderForCustomerNestedResponse `json:"orders"`
+	// ModifiedAt   string `json:"modifiedAt"`
 }
