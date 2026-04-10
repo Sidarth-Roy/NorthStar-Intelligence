@@ -34,7 +34,11 @@ func (r *customerRepo) GetByID(ctx context.Context, id uint) (*model.Customer, e
 
 func (r *customerRepo) GetAll(ctx context.Context) ([]model.Customer, error) {
 	var customers []model.Customer
-	err := r.db.WithContext(ctx).Find(&customers).Error
+	err := r.db.WithContext(ctx).
+				Preload("Orders").
+				Preload("Orders.Employee").
+				Preload("Orders.Shipper").
+				Find(&customers).Error
 	return customers, err
 }
 
