@@ -24,7 +24,11 @@ func (r *customerRepo) Create(ctx context.Context, c *model.Customer) error {
 
 func (r *customerRepo) GetByID(ctx context.Context, id uint) (*model.Customer, error) {
 	var c model.Customer
-	err := r.db.WithContext(ctx).First(&c, id).Error
+	err := r.db.WithContext(ctx).
+				Preload("Orders").
+				Preload("Orders.Employee").
+				Preload("Orders.Shipper").
+				First(&c, id).Error
 	return &c, err
 }
 
