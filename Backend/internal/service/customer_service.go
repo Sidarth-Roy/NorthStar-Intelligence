@@ -8,10 +8,10 @@ import (
 )
 
 type CustomerService interface {
-	Create(ctx context.Context, req dto.CustomerUpsertReq) (*dto.CustomerResponse, error)
+	Create(ctx context.Context, req dto.CustomerInsertReq) (*dto.CustomerResponse, error)
 	Get(ctx context.Context, id uint) (*dto.CustomerResponse, error)
 	List(ctx context.Context) ([]dto.CustomerResponse, error)
-	Update(ctx context.Context, id uint, req dto.CustomerUpsertReq) (*dto.CustomerResponse, error)
+	Update(ctx context.Context, id uint, req dto.CustomerUpdateReq) (*dto.CustomerResponse, error)
 	Delete(ctx context.Context, id uint) error
 }
 
@@ -19,7 +19,7 @@ type customerSvc struct{ repo repository.CustomerRepository }
 
 func NewCustomerSvc(r repository.CustomerRepository) CustomerService { return &customerSvc{repo: r} }
 
-func (s *customerSvc) Create(ctx context.Context, req dto.CustomerUpsertReq) (*dto.CustomerResponse, error) {
+func (s *customerSvc) Create(ctx context.Context, req dto.CustomerInsertReq) (*dto.CustomerResponse, error) {
 	c := &model.Customer{
 		CustomerID:   req.CustomerID,
 		CompanyName:  req.CompanyName,
@@ -46,7 +46,7 @@ func (s *customerSvc) List(ctx context.Context) ([]dto.CustomerResponse, error) 
 	return res, nil
 }
 
-func (s *customerSvc) Update(ctx context.Context, id uint, req dto.CustomerUpsertReq) (*dto.CustomerResponse, error) {
+func (s *customerSvc) Update(ctx context.Context, id uint, req dto.CustomerUpdateReq) (*dto.CustomerResponse, error) {
 	c, err := s.repo.GetByID(ctx, id)
 	if err != nil { return nil, err }
 	
@@ -75,6 +75,6 @@ func mapCustomerToDTO(c *model.Customer) *dto.CustomerResponse {
 		City:         c.City,
 		Country:      c.Country,
 		Active:       c.Active,
-		ModifiedAt:   c.UpdatedAt.String(),
+		// ModifiedAt:   c.UpdatedAt.String(),
 	}
 }
