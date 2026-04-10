@@ -24,6 +24,19 @@ type EmployeeUpdateReq struct {
 	ReportsTo    *uint  `json:"reportsTo"` // Pointer allows null in JSON
 }
 
+type OrderForEmployeeNestedResponse struct {
+	ID           uint      `json:"id"`
+	CustomerID   string    `json:"customerID"`
+	CompanyName  string    `json:"companyName"`
+	OrderDate    string	   `json:"orderDate"`
+	RequiredDate string	   `json:"requiredDate"`
+	ShippedDate  string	   `json:"shippedDate"`
+	ShipperID    uint      `json:"shipperID"`
+	ShipperName  string    `json:"shipperName"`
+	Freight      float64   `json:"freight"`
+	Active       bool      `json:"active"`
+}
+
 type EmployeeResponse struct {
 	ID           	uint   	`json:"id"`
 	EmployeeName 	string 	`json:"employeeName"`
@@ -31,6 +44,8 @@ type EmployeeResponse struct {
 	City         	string 	`json:"city"`
 	Country      	string 	`json:"country"`
 	ReportsTo    	*uint  	`json:"reportsTo"`
+	ReportsToName 	string 	`json:"reportsToName"`
 	Active       	bool   	`json:"active"`
 	// ModifiedAt   string `json:"modifiedAt"`
+	Orders			[]OrderForEmployeeNestedResponse `json:"orders"`
 }
