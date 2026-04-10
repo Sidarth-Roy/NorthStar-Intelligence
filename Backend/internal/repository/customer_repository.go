@@ -43,7 +43,7 @@ func (r *customerRepo) GetAll(ctx context.Context) ([]model.Customer, error) {
 }
 
 func (r *customerRepo) Update(ctx context.Context, c *model.Customer) error {
-	return r.db.WithContext(ctx).Save(c).Error
+    return r.db.WithContext(ctx).Model(c).Select("*").Updates(c).Error
 }
 
 func (r *customerRepo) Delete(ctx context.Context, id uint) error {
