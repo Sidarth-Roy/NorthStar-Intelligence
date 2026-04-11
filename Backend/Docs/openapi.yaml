@@ -1,0 +1,816 @@
+openapi: 3.0.3
+info:
+  title: NorthStar Intelligence API
+  version: 1.0.0
+  description: Full API documentation for the NorthStar Intelligence (Northwind-based) ERP Backend.
+servers:
+  - url: /api/v1
+    description: Local Development Server
+
+tags:
+  - name: Monitoring
+  - name: Products
+  - name: Categories
+  - name: Customers
+  - name: Employees
+  - name: Shippers
+  - name: Orders
+  - name: Order Details
+
+paths:
+  # MONITORING
+  /health:
+    get:
+      tags: [Monitoring]
+      summary: API Health Check
+      description: Check the status of the API and its core dependencies like the database.
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '503':
+          description: Service Unavailable (Database connection issues)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  # PRODUCTS
+  /products:
+    get:
+      tags: [Products]
+      summary: List all products
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ProductResponse' }
+    post:
+      tags: [Products]
+      summary: Create product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProductInsertReq' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProductResponse' }
+
+  /products/{id}:
+    get:
+      tags: [Products]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProductResponse' }
+    put:
+      tags: [Products]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProductUpdateReq' }
+      responses:
+        '200':
+          description: Updated
+    delete:
+      tags: [Products]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '204':
+          description: No Content
+
+  # CATEGORIES
+  /categories:
+    get:
+      tags: [Categories]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/CategoryResponse' }
+    post:
+      tags: [Categories]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CategoryCreateReq' }
+      responses:
+        '201':
+          description: Created
+
+  /categories/{id}:
+    get:
+      tags: [Categories]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+    put:
+      tags: [Categories]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CategoryUpdateReq' }
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags: [Categories]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '204':
+          description: Deleted
+
+  /categorieswithproducts/{id}:
+    get:
+      tags: [Categories]
+      summary: Get category with nested products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CategoryWithProductsResponse' }
+
+  # CUSTOMERS
+  /customers:
+    get:
+      tags: [Customers]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/CustomerResponse' }
+    post:
+      tags: [Customers]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CustomerInsertReq' }
+      responses:
+        '201':
+          description: Created
+
+  /customers/{id}:
+    get:
+      tags: [Customers]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+    put:
+      tags: [Customers]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CustomerUpdateReq' }
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags: [Customers]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '204':
+          description: Deleted
+
+  # EMPLOYEES
+  /employees:
+    get:
+      tags: [Employees]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/EmployeeResponse' }
+    post:
+      tags: [Employees]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EmployeeInsertReq' }
+      responses:
+        '201':
+          description: Created
+
+  /employees/{id}:
+    get:
+      tags: [Employees]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+    put:
+      tags: [Employees]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EmployeeUpdateReq' }
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags: [Employees]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '204':
+          description: Deleted
+
+  # SHIPPERS
+  /shippers:
+    get:
+      tags: [Shippers]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ShipperResponse' }
+    post:
+      tags: [Shippers]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ShipperInsertReq' }
+      responses:
+        '201':
+          description: Created
+
+  /shippers/{id}:
+    get:
+      tags: [Shippers]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+    put:
+      tags: [Shippers]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ShipperUpdateReq' }
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags: [Shippers]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '204':
+          description: Deleted
+
+  # ORDERS
+  /orders:
+    get:
+      tags: [Orders]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/OrderResponse' }
+    post:
+      tags: [Orders]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/OrderInsertReq' }
+      responses:
+        '201':
+          description: Created
+
+  /orders/{id}:
+    get:
+      tags: [Orders]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OrderResponse' }
+    put:
+      tags: [Orders]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/OrderUpdateReq' }
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags: [Orders]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '204':
+          description: Deleted
+
+  # ORDER DETAILS
+  /order-details:
+    get:
+      tags: [Order Details]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/OrderDetailResponse' }
+    post:
+      tags: [Order Details]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/OrderDetailInsertReq' }
+      responses:
+        '201':
+          description: Created
+
+  /order-details/{id}:
+    get:
+      tags: [Order Details]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+    put:
+      tags: [Order Details]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/OrderDetailUpdateReq' }
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags: [Order Details]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '204':
+          description: Deleted
+
+components:
+  schemas:
+    # MONITORING SCHEMAS
+    HealthDetails:
+      type: object
+      properties:
+        DB:
+          type: string
+          example: "ok"
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "ok"
+        details:
+          $ref: '#/components/schemas/HealthDetails'
+        
+    # PRODUCT SCHEMAS
+    ProductInsertReq:
+      type: object
+      required: [productName]
+      properties:
+        productName: { type: string }
+        quantityPerUnit: { type: string }
+        unitPrice: { type: number }
+        categoryID: { type: integer }
+        discontinued: { type: integer }
+
+    ProductUpdateReq:
+      type: object
+      required: [productName, quantityPerUnit, unitPrice, categoryID, discontinued]
+      properties:
+        productName: { type: string }
+        quantityPerUnit: { type: string }
+        unitPrice: { type: number }
+        categoryID: { type: integer }
+        discontinued: { type: integer }
+
+    ProductResponse:
+      type: object
+      properties:
+        id: { type: integer }
+        productName: { type: string }
+        unitPrice: { type: number }
+        quantityPerUnit: { type: string }
+        categoryID: { type: integer }
+        categoryName: { type: string }
+        discontinued: { type: integer }
+
+    # CATEGORY SCHEMAS
+    CategoryCreateReq:
+      type: object
+      required: [categoryName]
+      properties:
+        categoryName: { type: string }
+        description: { type: string }
+
+    CategoryUpdateReq:
+      type: object
+      required: [categoryName, description, active]
+      properties:
+        categoryName: { type: string }
+        description: { type: string }
+        active: { type: boolean }
+
+    CategoryResponse:
+      type: object
+      properties:
+        id: { type: integer }
+        categoryName: { type: string }
+        description: { type: string }
+        active: { type: boolean }
+
+    CategoryWithProductsResponse:
+      allOf:
+        - $ref: '#/components/schemas/CategoryResponse'
+        - type: object
+          properties:
+            products:
+              type: array
+              items: { $ref: '#/components/schemas/ProductForCategoryResponse' }
+
+    ProductForCategoryResponse:
+      type: object
+      properties:
+        id: { type: integer }
+        productName: { type: string }
+        unitPrice: { type: number }
+        quantityPerUnit: { type: string }
+        active: { type: boolean }
+
+    # CUSTOMER SCHEMAS
+    CustomerInsertReq:
+      type: object
+      required: [customerID, companyName]
+      properties:
+        customerID: { type: string, minLength: 5, maxLength: 5 }
+        companyName: { type: string }
+        contactName: { type: string }
+        contactTitle: { type: string }
+        city: { type: string }
+        country: { type: string }
+        active: { type: boolean }
+
+    CustomerUpdateReq:
+      type: object
+      required: [customerID, companyName, contactName, contactTitle, city, country]
+      properties:
+        customerID: { type: string, minLength: 5, maxLength: 5 }
+        companyName: { type: string }
+        contactName: { type: string }
+        contactTitle: { type: string }
+        city: { type: string }
+        country: { type: string }
+        active: { type: boolean }
+
+    CustomerResponse:
+      type: object
+      properties:
+        id: { type: integer }
+        customerID: { type: string }
+        companyName: { type: string }
+        contactName: { type: string }
+        contactTitle: { type: string }
+        city: { type: string }
+        country: { type: string }
+        active: { type: boolean }
+        orders:
+          type: array
+          items: { $ref: '#/components/schemas/OrderForCustomerNestedResponse' }
+
+    OrderForCustomerNestedResponse:
+      type: object
+      properties:
+        id: { type: integer }
+        employeeID: { type: integer }
+        employeeName: { type: string }
+        orderDate: { type: string }
+        requiredDate: { type: string }
+        shippedDate: { type: string }
+        shipperID: { type: integer }
+        shipperName: { type: string }
+        freight: { type: number }
+        active: { type: boolean }
+
+    # EMPLOYEE SCHEMAS
+    EmployeeInsertReq:
+      type: object
+      required: [employeeName, title]
+      properties:
+        employeeName: { type: string }
+        title: { type: string }
+        city: { type: string }
+        country: { type: string }
+        reportsTo: { type: integer, nullable: true }
+
+    EmployeeUpdateReq:
+      type: object
+      required: [employeeName, title]
+      properties:
+        employeeName: { type: string }
+        title: { type: string }
+        city: { type: string }
+        country: { type: string }
+        reportsTo: { type: integer, nullable: true }
+
+    EmployeeResponse:
+      type: object
+      properties:
+        id: { type: integer }
+        employeeName: { type: string }
+        title: { type: string }
+        city: { type: string }
+        country: { type: string }
+        reportsTo: { type: integer, nullable: true }
+        reportsToName: { type: string }
+        active: { type: boolean }
+        orders:
+          type: array
+          items: { $ref: '#/components/schemas/OrderForEmployeeNestedResponse' }
+
+    OrderForEmployeeNestedResponse:
+      type: object
+      properties:
+        id: { type: integer }
+        customerID: { type: string }
+        companyName: { type: string }
+        orderDate: { type: string }
+        requiredDate: { type: string }
+        shippedDate: { type: string }
+        shipperID: { type: integer }
+        shipperName: { type: string }
+        freight: { type: number }
+        active: { type: boolean }
+
+    # SHIPPER SCHEMAS
+    ShipperInsertReq:
+      type: object
+      required: [companyName]
+      properties:
+        companyName: { type: string }
+        active: { type: boolean }
+
+    ShipperUpdateReq:
+      type: object
+      required: [companyName]
+      properties:
+        companyName: { type: string }
+        active: { type: boolean }
+
+    ShipperResponse:
+      type: object
+      properties:
+        id: { type: integer }
+        companyName: { type: string }
+        active: { type: boolean }
+        orders:
+          type: array
+          items: { $ref: '#/components/schemas/OrderForShipperNestedResponse' }
+
+    OrderForShipperNestedResponse:
+      type: object
+      properties:
+        id: { type: integer }
+        customerID: { type: integer }
+        customerName: { type: string }
+        orderDate: { type: string }
+        requiredDate: { type: string }
+        shippedDate: { type: string }
+        shipperID: { type: integer }
+        shipperName: { type: string }
+        freight: { type: number }
+        active: { type: boolean }
+
+    # ORDER SCHEMAS
+    OrderInsertReq:
+      type: object
+      required: [orderID, customerID, employeeID, orderDate, requiredDate, shipperID]
+      properties:
+        orderID: { type: integer }
+        customerID: { type: string }
+        employeeID: { type: integer }
+        orderDate: { type: string }
+        requiredDate: { type: string }
+        shippedDate: { type: string }
+        shipperID: { type: integer }
+        freight: { type: number }
+        active: { type: boolean }
+
+    OrderUpdateReq:
+      type: object
+      required: [customerID, employeeID, orderDate, requiredDate, shipperID, active]
+      properties:
+        customerID: { type: string }
+        employeeID: { type: integer }
+        orderDate: { type: string }
+        requiredDate: { type: string }
+        shippedDate: { type: string }
+        shipperID: { type: integer }
+        freight: { type: number }
+        active: { type: boolean }
+
+    OrderResponse:
+      type: object
+      properties:
+        id: { type: integer }
+        customerID: { type: string }
+        customerName: { type: string }
+        employeeID: { type: integer }
+        employeeName: { type: string }
+        orderDate: { type: string }
+        requiredDate: { type: string }
+        shippedDate: { type: string }
+        shipperID: { type: integer }
+        shipperName: { type: string }
+        freight: { type: number }
+        active: { type: boolean }
+        orderDetails:
+          type: array
+          items: { $ref: '#/components/schemas/OrderDetailForNestedResponse' }
+
+    # ORDER DETAIL SCHEMAS
+    OrderDetailInsertReq:
+      type: object
+      required: [orderID, productID, unitPrice, quantity, discount]
+      properties:
+        orderID: { type: integer }
+        productID: { type: integer }
+        unitPrice: { type: number }
+        quantity: { type: integer }
+        discount: { type: number }
+
+    OrderDetailUpdateReq:
+      type: object
+      required: [orderID, productID, unitPrice, quantity, discount]
+      properties:
+        orderID: { type: integer }
+        productID: { type: integer }
+        unitPrice: { type: number }
+        quantity: { type: integer }
+        discount: { type: number }
+
+    OrderDetailResponse:
+      type: object
+      properties:
+        id: { type: integer }
+        orderID: { type: integer }
+        productID: { type: integer }
+        productName: { type: string }
+        unitPrice: { type: number }
+        quantity: { type: integer }
+        discount: { type: number }
+
+    OrderDetailForNestedResponse:
+      type: object
+      properties:
+        id: { type: integer }
+        productID: { type: integer }
+        productName: { type: string }
+        unitPrice: { type: number }
+        quantity: { type: integer }
+        discount: { type: number }
+
+    ErrorResponse:
+      type: object
+      properties:
+        error: { type: string }
