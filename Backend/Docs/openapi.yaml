@@ -8,6 +8,7 @@ servers:
     description: Local Development Server
 
 tags:
+  - name: Monitoring
   - name: Products
   - name: Categories
   - name: Customers
@@ -17,6 +18,26 @@ tags:
   - name: Order Details
 
 paths:
+  # MONITORING
+  /health:
+    get:
+      tags: [Monitoring]
+      summary: API Health Check
+      description: Check the status of the API and its core dependencies like the database.
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '503':
+          description: Service Unavailable (Database connection issues)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
   # PRODUCTS
   /products:
     get:
@@ -466,6 +487,23 @@ paths:
 
 components:
   schemas:
+    # MONITORING SCHEMAS
+    HealthDetails:
+      type: object
+      properties:
+        DB:
+          type: string
+          example: "ok"
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "ok"
+        details:
+          $ref: '#/components/schemas/HealthDetails'
+        
     # PRODUCT SCHEMAS
     ProductInsertReq:
       type: object
