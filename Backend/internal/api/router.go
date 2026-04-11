@@ -2,11 +2,14 @@ package api
 
 import (
 	"net/http"
+	"time"
+
 	"github.com/Sidarth-Roy/NorthStar-Intelligence/Backend/internal/app"
 	"github.com/Sidarth-Roy/NorthStar-Intelligence/Backend/internal/middleware"
 	"github.com/Sidarth-Roy/NorthStar-Intelligence/Backend/pkg/config"
 	"github.com/Sidarth-Roy/NorthStar-Intelligence/Backend/pkg/db"
 	"github.com/Sidarth-Roy/NorthStar-Intelligence/Backend/internal/dto"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -36,7 +39,18 @@ const swaggerHTML = `<!DOCTYPE html>
 func SetupRouter(deps *app.AppContainer) *gin.Engine {
 	r := gin.New()
 
-	// 1. Traceability Middleware
+	// 1. CORS CONFIGURATION (Industry Best Practice)
+	// In a real production app, move the "AllowOrigins" to your config/env file
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:5173", "http://localhost:3000"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization", "X-Request-ID"},
+		ExposeHeaders:    []string{"Content-Length", "X-Request-ID"}, // Allows React to read your Trace ID
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour, // Preflight request caching
+	}))
+
+	// 2. Traceability Middleware
 	r.Use(middleware.RequestIDMiddleware())
 	
 	// Standard Gin Logger for Console
@@ -44,7 +58,7 @@ func SetupRouter(deps *app.AppContainer) *gin.Engine {
 
 	r.Use(gin.Recovery())
 
-	// 2. Exception & Logger Middleware
+	// 3. Exception & Logger Middleware
 	r.Use(middleware.GlobalExceptionHandler())
 
 	// --------------------------------------------------------
