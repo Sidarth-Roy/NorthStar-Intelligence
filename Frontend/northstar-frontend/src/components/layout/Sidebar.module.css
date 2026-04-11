@@ -1,0 +1,49 @@
+@reference "../../index.css";
+
+.aside {
+  @apply w-64 bg-slate-900 text-slate-300 flex flex-col h-screen sticky top-0 shrink-0;
+}
+
+.brand {
+  @apply p-6 border-b border-slate-800;
+}
+
+.brandTitle {
+  @apply text-lg font-bold text-white tracking-tight;
+}
+
+.brandSubtitle {
+  @apply text-xs text-slate-500 mt-1 uppercase tracking-wider;
+}
+
+.nav {
+  @apply flex-1 py-6 px-4 space-y-1 overflow-y-auto;
+}
+
+.navItem {
+  @apply flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white;
+}
+
+.navItemActive {
+  @apply flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors bg-blue-600 text-white hover:bg-blue-700;
+}
+
+.icon {
+  @apply w-5 h-5 opacity-80;
+}
+
+.mainLayout {
+  @apply flex min-h-screen bg-slate-50;
+}
+
+.contentWrapper {
+  @apply flex-1 flex flex-col min-w-0;
+}
+
+.header {
+  @apply h-16 bg-white border-b border-slate-200 flex items-center px-8 shrink-0;
+}
+
+.mainArea {
+  @apply p-8 flex-1 overflow-auto;
+}

@@ -25,6 +25,7 @@ func (s *productSvc) Create(ctx context.Context, req dto.ProductInsertReq) (*dto
 		UnitPrice: req.UnitPrice, 
 		CategoryID: req.CategoryID,
 		QuantityPerUnit: req.QuantityPerUnit,
+		Discontinued: req.Discontinued,
 	}
 	if err := s.repo.Create(ctx, p); err != nil { return nil, err }
 	return mapToDTO(p), nil

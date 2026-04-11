@@ -1,0 +1,53 @@
+@reference "../../../index.css";
+
+.container {
+  @apply mt-6;
+}
+
+.title {
+  @apply text-xl font-semibold mb-4 text-slate-900;
+}
+
+.tableWrapper {
+  @apply overflow-x-auto border rounded-lg;
+}
+
+.inventoryTable {
+  @apply w-full text-left border-collapse;
+}
+
+.thead {
+  @apply bg-slate-100 border-b;
+}
+
+.th {
+  @apply p-3 font-medium text-slate-700;
+}
+
+.tr {
+  @apply border-b hover:bg-slate-50 transition-colors;
+}
+
+.td {
+  @apply p-3;
+}
+
+.tdMuted {
+  @apply p-3 text-slate-500;
+}
+
+.tdPrice {
+  @apply p-3 text-right font-mono;
+}
+
+.badge {
+  @apply px-2 py-1 rounded-full text-xs font-medium;
+}
+
+.badgeActive {
+  @apply bg-green-100 text-green-700;
+}
+
+.badgeDiscontinued {
+  @apply bg-red-100 text-red-700;
+}
